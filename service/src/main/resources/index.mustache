@@ -58,7 +58,7 @@ jQuery(document).ready(function() {
             <form name="create_product">
 
                 <label for="productId">Product Id</label>
-                <input id="productId" name="productId" value="67890">
+                <input id="productId" name="productId" value="1">
 
                 <label for="productName">Product Name</label>
                 <input id="productName" name="productName" value="">
@@ -85,10 +85,10 @@ jQuery(document).ready(function() {
              productName = $("input[name='productName']", $(this)).val(),
              productRating = $("input[name='productRating']", $(this)).val();
 
-         var ratingEntry = new Object();
-         ratingEntry.productId = productId;
-         ratingEntry.productName = productName;
-         ratingEntry.productRating = productRating;
+         var productEntry = new Object();
+         productEntry.productId = productId;
+         productEntry.productName = productName;
+         productEntry.productRating = productRating;
 
          var entryString = JSON.stringify(productEntry);
 

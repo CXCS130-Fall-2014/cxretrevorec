@@ -69,6 +69,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         * endpoints
          */
         environment.addResource(new ProductResource(productDao, mapper));
+        environment.addResource(new IndexResource());
     }
 
 }

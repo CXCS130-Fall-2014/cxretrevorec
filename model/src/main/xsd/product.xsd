@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0"
+           targetNamespace="http://www.shopzilla.com/services/product"
+           elementFormDefault="qualified" attributeFormDefault="qualified"
+           xmlns:tns="http://www.shopzilla.com/services/product"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="ProductResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tns:ProductEntry" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ProductEntry">
+    <xs:complexType>
+      <xs:attributeGroup ref="tns:coreAttributes"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name="coreAttributes">
+    <xs:attribute name="productId" type="xs:long"/>
+    <xs:attribute name="productName" type="xs:string"/>
+    <xs:attribute name="productRating" type="xs:long"/>
+  </xs:attributeGroup>
+
+</xs:schema>

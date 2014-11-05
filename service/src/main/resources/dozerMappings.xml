@@ -5,12 +5,8 @@
           http://dozer.sourceforge.net/schema/beanmapping.xsd">
 
   <mapping>
-    <class-a>com.shopzilla.service.shoppingcart.data.ShoppingCartEntry</class-a>
-    <class-b>com.shopzilla.site.service.shoppingcart.model.jaxb.ShoppingCartEntry</class-b>
-    <field>
-      <a>shopperId</a>
-      <b>shopperId</b>
-    </field>
+    <class-a>com.shopzilla.service.product.data.ProductEntry</class-a>
+    <class-b>com.shopzilla.site.service.product.model.jaxb.ProductEntry</class-b>
     <field>
       <a>productId</a>
       <b>productId</b>
@@ -20,8 +16,8 @@
       <b>productName</b>
     </field>
     <field>
-      <a>productCost</a>
-      <b>productCost</b>
+      <a>productRating</a>
+      <b>productRating</b>
     </field>
   </mapping>
 

@@ -17,7 +17,7 @@
     <module>model</module>
     <module>core</module>
     <module>service</module>
-    <module>shoppingcart-client</module>
+    <module>product-client</module>
   </modules>
 
     <properties>

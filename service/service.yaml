@@ -60,8 +60,8 @@ logging:
   # Logger-specific levels.
   loggers:
 
-    # Sets the level for 'com.shopzilla.service.shoppingcart' to DEBUG.
-    com.shopzilla.service.shoppingcart: DEBUG
+    # Sets the level for 'com.shopzilla.service.product' to DEBUG.
+    com.shopzilla.service.product: DEBUG
     org.skife.jdbi.v2: DEBUG
 
   # Settings for logging to stdout.

@@ -24,7 +24,7 @@ public interface ShoppingCartDao extends Transactional<ShoppingCartDao> {
 
     /* Read */
     @SqlQuery(
-            "SELECT * FROM shopping_cart_entry WHERE shopper_id = :q.shopperId "
+            "SELECT * FROM reviews WHERE pid = :q.shopperId "
     )
     public List<ShoppingCartEntry> getShoppingCartEntries(@BindBean("q") ShoppingCartQuery query);
 

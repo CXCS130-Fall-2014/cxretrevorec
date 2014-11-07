@@ -53,7 +53,7 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
                 "h2");
         Handle handle = jdbi.open();
         handle.execute("create table if not exists shopping_cart_entry (shopper_id integer not null,product_id integer not null,product_name varchar(255) not null,product_cost integer not null,primary key (shopper_id, product_id))");
-        //handle.execute("create table if not exists reviews (pid integer not null,title varchar(50) not null, rating integer not null, comment varchar(255) not null,primary key (shopper_id, product_id))");
+        loadReviews(handle);
 
         /*
          * "real" database DAO
@@ -80,6 +80,14 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
     }
 
     public boolean loadReviews(Handle handle) {
+        handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
+                "rid LONG NOT NULL," +
+                "pid LONG NOT NULL," +
+                "title VARCHAR(50) NOT NULL," +
+                "rating INTEGER NOT NULL," +
+                "comment VARCHAR(255) NOT NULL," +
+                "primary key (rid))");
+
         Document dom;
         // Make an instance of the DocumentBuilderFactory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -89,6 +97,7 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
             // parse using the builder to get the DOM mapping of the XML file
             dom = db.parse("reviews.xml");
 
+            long rid = 0;
             String pid = null;
             String title = null;
             String rating = null;
@@ -111,8 +120,12 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
                             NamedNodeMap nnm2 = review.getAttributes();
                             title = nnm2.getNamedItem("Title").getNodeValue();
                             comment = nnm2.getNamedItem("Value").getNodeValue();
-                            rating = nnm2.getNamedItem("Value").getNodeValue();
-                            System.out.println(pid + title + rating + comment);
+                            rating = nnm2.getNamedItem("Rating").getNodeValue();
+
+                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) " +
+                                    "KEY (rid) " +
+                                    "VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
+                            rid++;
                         }
                     }
                 }

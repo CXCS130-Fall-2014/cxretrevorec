@@ -94,7 +94,6 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
 					String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
 					String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
 					
-					
 					handle.execute("insert into products values (" + pid + ", \'" + cat + "\', \'" + name + "\')");
 				}
     		}

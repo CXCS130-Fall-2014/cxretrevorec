@@ -52,7 +52,8 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
                 configuration.getDatabaseConfiguration(),
                 "h2");
         Handle handle = jdbi.open();
-        handle.execute("create table if not exists shopping_cart_entry (shopper_id integer not null,product_id integer not null,product_name varchar(255) not null,product_cost integer not null,primary key (shopper_id, product_id))");
+        // This is so I can change my table
+        handle.execute("DROP ALL OBJECTS");
         loadReviews(handle);
 
         /*
@@ -80,12 +81,15 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
     }
 
     public boolean loadReviews(Handle handle) {
+        // max title length in the dataset is 150
+        // max comment length in the dataset is 1952
+        // title and comments need single quotes escaped
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
-                "title VARCHAR(50) NOT NULL," +
-                "rating INTEGER NOT NULL," +
-                "comment VARCHAR(255) NOT NULL," +
+                "title VARCHAR(250) NOT NULL," +
+                "rating INTEGER," +
+                "comment VARCHAR(3000) NOT NULL," +
                 "primary key (rid))");
 
         Document dom;
@@ -122,6 +126,17 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
                             comment = nnm2.getNamedItem("Value").getNodeValue();
                             rating = nnm2.getNamedItem("Rating").getNodeValue();
 
+                            // single quotes are escaped by single quotes in h2
+                            title = title.replace("'", "''");
+                            comment = comment.replace("'", "''");
+                            // backslashs cause problems in h2
+                            title = title.replace("\\", "/");
+                            comment = comment.replace("\\", "/");
+                            // some ratings are empty
+                            rating = (rating.isEmpty()) ? "NULL" : rating;
+
+                            String output = pid + title + rating + comment;
+                            System.out.println(output);
                             handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) " +
                                     "KEY (rid) " +
                                     "VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");

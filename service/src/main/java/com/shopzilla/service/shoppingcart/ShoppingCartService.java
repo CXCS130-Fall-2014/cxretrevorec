@@ -86,6 +86,7 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
     void importProductData(Handle handle) throws IOException {
     	handle.execute("create table if not exists products (product_id bigint not null,product_category varchar(255) not null,product_name varchar(255) not null,primary key (product_id))");
     	handle.execute("delete from products");
+    	System.out.println("The directory is " + new java.io.File( "." ).getCanonicalPath());
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
     	try {
     		for (String s = raf.readLine(); s != null; s=raf.readLine()) {
@@ -93,10 +94,13 @@ public class ShoppingCartService extends Service<ShoppingCartServiceConfiguratio
 					long pid = Long.parseLong(fieldFromLine(raf.readLine()));
 					String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
 					String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+					cat = 	cat.replace("\\", "/");
+					name = 	name.replace("\\", "/");
 					
 					handle.execute("insert into products values (" + pid + ", \'" + cat + "\', \'" + name + "\')");
 				}
     		}
+    		System.out.println("Product data loaded successfully");
     	} finally {
     		raf.close();
     	}

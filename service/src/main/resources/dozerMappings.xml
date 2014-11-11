@@ -21,4 +21,29 @@
     </field>
   </mapping>
 
+  <mapping>
+    <class-a>com.shopzilla.service.product.data.ReviewEntry</class-a>
+    <class-b>com.shopzilla.site.service.product.model.jaxb.ReviewEntry</class-b>
+    <field>
+      <a>pid</a>
+      <b>pid</b>
+    </field>
+    <field>
+      <a>rid</a>
+      <b>rid</b>
+    </field>
+    <field>
+      <a>title</a>
+      <b>title</b>
+    </field>
+    <field>
+      <a>rating</a>
+      <b>rating</b>
+    </field>
+    <field>
+      <a>comment</a>
+      <b>comment</b>
+    </field>
+  </mapping>
+
 </mappings>

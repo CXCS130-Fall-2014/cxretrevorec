@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0"
+           targetNamespace="http://www.shopzilla.com/services/product"
+           elementFormDefault="qualified" attributeFormDefault="qualified"
+           xmlns:tns="http://www.shopzilla.com/services/product"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="ReviewResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="tns:ReviewEntry" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ReviewEntry">
+    <xs:complexType>
+      <xs:attributeGroup ref="tns:coreReviewAttributes"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name="coreReviewAttributes">
+    <xs:attribute name="pid" type="xs:long"/>
+    <xs:attribute name="rid" type="xs:long"/>
+    <xs:attribute name="title" type="xs:string"/>
+    <xs:attribute name="rating" type="xs:int"/>
+    <xs:attribute name="comment" type="xs:string"/>
+  </xs:attributeGroup>
+
+</xs:schema>

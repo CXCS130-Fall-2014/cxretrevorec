@@ -6,6 +6,7 @@ package com.shopzilla.service.product;
 
 import com.google.common.collect.Lists;
 import com.shopzilla.service.product.data.ProductDao;
+import com.shopzilla.service.product.data.ReviewDao;
 import com.shopzilla.service.product.resource.*;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.assets.AssetsBundle;
@@ -60,6 +61,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
          * "real" database DAO
          */
         final ProductDao productDao = jdbi.onDemand(ProductDao.class);
+        final ReviewDao reviewDao = jdbi.onDemand(ReviewDao.class);
 
         /*
         * health checks
@@ -75,6 +77,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         * endpoints
          */
         environment.addResource(new ProductResource(productDao, mapper));
+        environment.addResource(new ReviewResource(reviewDao, mapper));
         environment.addResource(new IndexResource());
     }
 
@@ -83,7 +86,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         // max comment length in the dataset is 1952
         // title and comments need single quotes escaped
 
-        handle.execute("create table if not exists product_entry (product_id integer not null,product_name varchar(255) not null,product_rating integer not null,primary key (product_id))");
+        handle.execute("create table if not exists product_entry (product_id long not null,product_name varchar(255) not null,product_rating integer not null,primary key (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
@@ -96,6 +99,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         // Make an instance of the DocumentBuilderFactory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
+
             // use the factory to take an instance of the document builder
             DocumentBuilder db = dbf.newDocumentBuilder();
             // parse using the builder to get the DOM mapping of the XML file
@@ -110,7 +114,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
 
-            for (int i = 0; i < products.getLength(); i++) {
+            for (int i = 0; i < 100; i++) {//products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();
@@ -136,10 +140,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             rating = (rating.isEmpty()) ? "NULL" : rating;
 
                             String output = pid + title + rating + comment;
-                            System.out.println(output);
-                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) " +
-                                    "KEY (rid) " +
-                                    "VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
+                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
                             rid++;
                         }
                     }

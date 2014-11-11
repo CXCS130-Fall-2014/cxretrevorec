@@ -49,6 +49,47 @@ jQuery(document).ready(function() {
 });
 </script>
 
+<!--GET REVIEWS METHOD-->
+<div>
+    <div class="row-fluid">
+        <div class="span5">
+
+            <h2>Get Reviews</h2>
+            <form name="get_review">
+
+                <label for="pid">Pid</label>
+                <input id="pid" name="pid" value="4198654574">
+                <br><br>
+                <input type="submit" name="fetch" value="Fetch">
+            </form>
+        </div>
+    </div>
+    <div id="get_review_service_call" style="display:none;"><a href="#">link</a></div>
+    <div id="get_review_results" style="width:100%;"/>
+</div>
+
+<script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+jQuery(document).ready(function() {
+    $("form[name='get_review']").submit(function(e) {
+        e.preventDefault();
+
+        var pid = $("input[name='pid']", $(this)).val();
+
+        var get_url = "/services/product/v1/review/pid/" + pid + "?format=json";
+        $("#get_review_service_call a").attr('href', get_url).text(get_url).parent().show();
+        $.ajax({
+            url: get_url,
+            success:function(r) {
+                var output = "The review's pid is " + r.reviewEntry[0].pid +" and it's title is " + r.reviewEntry[0].title + " and the rating is " + r.reviewEntry[0].rating + " and the comment is " + r.reviewEntry[0].comment + "."; 
+                $("#get_review_results").html("<pre>" + output + "</pre>");
+            }
+        });
+    });
+
+});
+</script>
+
 <!-- CREATE METHOD -->
 
 <div>

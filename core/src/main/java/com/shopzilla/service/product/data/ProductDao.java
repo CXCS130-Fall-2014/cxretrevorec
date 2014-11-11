@@ -17,8 +17,7 @@ import java.util.List;
 public interface ProductDao extends Transactional<ProductDao> {
     /* Create */
     @SqlUpdate(
-            " INSERT INTO product_entry (product_id, product_name, product_rating) " +
-                    " VALUES (:q.productId, :q.productName, :q.productRating)"
+            " INSERT INTO product_entry (product_id, product_category, product_name) " + " VALUES (:q.productId, :q.productCategory, :q.productName)"
     )
     public void createProductEntry(@BindBean("q") ProductEntry product);
 

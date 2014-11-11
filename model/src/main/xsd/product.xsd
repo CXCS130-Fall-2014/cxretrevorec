@@ -22,7 +22,7 @@
   <xs:attributeGroup name="coreAttributes">
     <xs:attribute name="productId" type="xs:long"/>
     <xs:attribute name="productName" type="xs:string"/>
-    <xs:attribute name="productRating" type="xs:long"/>
+    <xs:attribute name="productCategory" type="xs:string"/>
   </xs:attributeGroup>
 
 </xs:schema>

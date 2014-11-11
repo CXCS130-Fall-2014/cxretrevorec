@@ -4,6 +4,8 @@
  */
 package com.shopzilla.service.product;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import com.google.common.collect.Lists;
 import com.shopzilla.service.product.data.ProductDao;
 import com.shopzilla.service.product.data.ReviewDao;
@@ -81,12 +83,20 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         environment.addResource(new IndexResource());
     }
 
-    public boolean loadReviews(Handle handle) {
+    //Helper function to import product data
+    String fieldFromLine(String xmlLine) {
+        int start = xmlLine.indexOf(">")+1;
+        int end = xmlLine.indexOf("<", start);
+        return xmlLine.substring(start, end);
+    }
+
+    public boolean loadReviews(Handle handle) throws IOException{
         // max title length in the dataset is 150
         // max comment length in the dataset is 1952
         // title and comments need single quotes escaped
 
-        handle.execute("create table if not exists product_entry (product_id long not null,product_name varchar(255) not null,product_rating integer not null,primary key (product_id))");
+        //Create the two tables, product_entry and reviews
+        handle.execute("create table if not exists product_entry (product_id long not null,product_category varchar(255) not null, product_name varchar(255) not null,primary key (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
@@ -95,6 +105,28 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 "comment VARCHAR(3000) NOT NULL," +
                 "primary key (rid))");
 
+        //Import all product data from dataset2.xml
+    	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
+        int numProducts = 0;
+    	try {
+            for (String s = raf.readLine(); s != null; s=raf.readLine()) {
+                if (numProducts == 100) {
+                  break;
+                }
+                if (s.equals("<doc>")) {
+                    long pid = Long.parseLong(fieldFromLine(raf.readLine()));
+                    String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+                    String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+                    
+                    handle.execute("INSERT INTO product_entry VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                    numProducts++;
+                }
+            }
+        } finally {
+            raf.close();
+        }
+
+        //Import review data from dataset.xml
         Document dom;
         // Make an instance of the DocumentBuilderFactory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

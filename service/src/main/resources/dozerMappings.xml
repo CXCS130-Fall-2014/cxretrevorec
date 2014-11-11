@@ -16,8 +16,8 @@
       <b>productName</b>
     </field>
     <field>
-      <a>productRating</a>
-      <b>productRating</b>
+      <a>productCategory</a>
+      <b>productCategory</b>
     </field>
   </mapping>
 

@@ -19,7 +19,7 @@ public class ProductEntry {
 
     private Long productId;
     private String productName;
-    private Long productRating;
+    private String productCategory;
 
     public Long getProductId() {
         return productId;
@@ -37,12 +37,12 @@ public class ProductEntry {
         this.productName = productName;
     }
 
-    public Long getProductRating() {
-        return productRating;
+    public String getProductCategory() {
+        return productCategory;
     }
 
-    public void setProductRating(Long productRating) {
-        this.productRating = productRating;
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
     }
 
     /**
@@ -54,7 +54,7 @@ public class ProductEntry {
             final ProductEntry toReturn = new ProductEntry();
             toReturn.setProductId(rs.getLong("product_id"));
             toReturn.setProductName(rs.getString("product_name"));
-            toReturn.setProductRating(rs.getLong("product_rating"));
+            toReturn.setProductCategory(rs.getString("product_category"));
             return toReturn;
         }
     }

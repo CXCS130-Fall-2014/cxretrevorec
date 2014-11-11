@@ -17,7 +17,7 @@
             <form name="get_product">
 
                 <label for="productId">Product Id</label>
-                <input id="productId" name="productId" value="1">
+                <input id="productId" name="productId" value="7581359">
                 <br><br>
                 <input type="submit" name="fetch" value="Fetch">
             </form>
@@ -40,7 +40,7 @@ jQuery(document).ready(function() {
         $.ajax({
             url: get_url,
             success:function(r) {
-                var output = "The product id is " + r.productEntry[0].productId +" and it's name is " + r.productEntry[0].productName + " and the rating is " + r.productEntry[0].productRating + "."; 
+                var output = "The product id is " + r.productEntry[0].productId +" and it's category is " + r.productEntry[0].productCategory + " and the name is " + r.productEntry[0].productName + "."; 
                 $("#get_results").html("<pre>" + output + "</pre>");
             }
         });
@@ -105,8 +105,8 @@ jQuery(document).ready(function() {
                 <label for="productName">Product Name</label>
                 <input id="productName" name="productName" value="">
 
-                <label for="productRating">Product Rating</label>
-                <input id="productRating" name="productRating" value="">
+                <label for="productCategory">Product Category</label>
+                <input id="productCategory" name="productCategory" value="">
 
                 <br><br>
                 <input type="submit" name="fetch" value="Create">
@@ -125,12 +125,12 @@ jQuery(document).ready(function() {
 
          var productId = $("input[name='productId']", $(this)).val(),
              productName = $("input[name='productName']", $(this)).val(),
-             productRating = $("input[name='productRating']", $(this)).val();
+             productCategory = $("input[name='productCategory']", $(this)).val();
 
          var productEntry = new Object();
          productEntry.productId = productId;
          productEntry.productName = productName;
-         productEntry.productRating = productRating;
+         productEntry.productCategory = productCategory;
 
          var entryString = JSON.stringify(productEntry);
 

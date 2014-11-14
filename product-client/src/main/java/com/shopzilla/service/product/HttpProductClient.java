@@ -30,7 +30,7 @@ public class HttpProductClient implements ProductClient {
             throws ProductException {
 
         WebResource request = resource.path(
-                String.format("/productId/%d", query.getProductId()));
+                String.format("/productName/%d", query.getProductName()));
         try {
             return request.accept(MediaType.APPLICATION_XML_TYPE).get(ProductResponse.class);
         } catch (UniformInterfaceException e) {

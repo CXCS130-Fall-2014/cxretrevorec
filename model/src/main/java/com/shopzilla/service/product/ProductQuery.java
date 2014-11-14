@@ -13,6 +13,7 @@ import com.google.common.base.Objects;
 public class ProductQuery {
 
     private Long productId;
+    private String productName;
 
     private ProductQuery() {
         // use the builder
@@ -24,6 +25,14 @@ public class ProductQuery {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     @Override
@@ -57,8 +66,8 @@ public class ProductQuery {
 
         private final ProductQuery q = new ProductQuery();
 
-        public Builder productId(Long productId) {
-            q.productId = productId;
+        public Builder productName(String productName) {
+            q.productName = productName;
             return this;
         }
 

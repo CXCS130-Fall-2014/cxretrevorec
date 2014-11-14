@@ -16,8 +16,8 @@
             <h2>Get Product</h2>
             <form name="get_product">
 
-                <label for="productId">Product Id</label>
-                <input id="productId" name="productId" value="7581359">
+                <label for="productName">Product Name</label>
+                <input id="productName" name="productName" value="7581359">
                 <br><br>
                 <input type="submit" name="fetch" value="Fetch">
             </form>
@@ -33,14 +33,14 @@ jQuery(document).ready(function() {
     $("form[name='get_product']").submit(function(e) {
         e.preventDefault();
 
-        var productId = $("input[name='productId']", $(this)).val();
+        var productName = $("input[name='productName']", $(this)).val();
 
-        var get_url = "/services/product/v1/product/productId/" + productId + "?format=json";
+        var get_url = "/services/product/v1/product/productName/" + productName + "?format=json";
         $("#get_service_call a").attr('href', get_url).text(get_url).parent().show();
         $.ajax({
             url: get_url,
             success:function(r) {
-                var output = "The product id is " + r.productEntry[0].productId +" and it's category is " + r.productEntry[0].productCategory + " and the name is " + r.productEntry[0].productName + "."; 
+                var output = "The product id is " + r.productEntry[0].productId +" and it's category is " + r.productEntry[0].productCategory + " and the name is " + r.productEntry[0].productName + ".";
                 $("#get_results").html("<pre>" + output + "</pre>");
             }
         });

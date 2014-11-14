@@ -44,17 +44,17 @@ public class ProductResource {
     @GET
     @JSONP
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("productId/{productId}")
-    public Response get(@PathParam("productId") Long productId,
+    @Path("productName/{productName}")
+    public Response get(@PathParam("productName") String productName,
                         @QueryParam("format") Format format) {
 
-        if (productId == null) {
-            LOG.debug("A valid product id must be provided");
+        if (productName == null) {
+            LOG.debug("A valid product name must be provided");
             return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
 
         ProductResponse response = new ProductResponse();
-        ProductQuery query = ProductQuery.builder().productId(productId).build();
+        ProductQuery query = ProductQuery.builder().productName(productName).build();
         List<com.shopzilla.service.product.data.ProductEntry> daoResults =
                 dao.getProductEntries(query);
         for (com.shopzilla.service.product.data.ProductEntry product : daoResults) {
@@ -79,7 +79,7 @@ public class ProductResource {
 
         // Verify that the entry doesn't already exist
         ProductQuery query = ProductQuery.builder()
-                .productId(product.getProductId())
+                .productName(product.getProductName())
                 .build();
         List<com.shopzilla.service.product.data.ProductEntry> entries =
                 dao.getProductEntries(query);

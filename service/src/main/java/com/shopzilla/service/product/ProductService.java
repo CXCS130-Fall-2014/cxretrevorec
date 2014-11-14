@@ -115,7 +115,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     cat = cat.replace("\\", "/");
                     name = name.replace("\\", "/");
                     
-                    handle.execute("INSERT INTO product_entry VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
                 }
             }
         } finally {

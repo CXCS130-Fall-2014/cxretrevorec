@@ -1,0 +1,11 @@
+table, th, tr, td {
+  border: 1px solid black;
+}
+th, tr {
+  padding: 5px;
+}
+
+ul {
+  list-style-image: url("http://img01.shopzilla-images.com/s2static/us/sz/1b0e6c52/sz2/common/images/shopzilla.ico");
+    
+}

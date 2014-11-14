@@ -56,8 +56,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 "h2");
         Handle handle = jdbi.open();
         // This is so I can change my table
-        handle.execute("DROP ALL OBJECTS");
-        loadReviews(handle);
+        loadData(handle);
 
         /*
          * "real" database DAO
@@ -90,7 +89,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         return xmlLine.substring(start, end);
     }
 
-    public boolean loadReviews(Handle handle) throws IOException{
+    public boolean loadData(Handle handle) throws IOException{
         // max title length in the dataset is 150
         // max comment length in the dataset is 1952
         // title and comments need single quotes escaped
@@ -107,19 +106,16 @@ public class ProductService extends Service<ProductServiceConfiguration> {
 
         //Import all product data from dataset2.xml
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
-        int numProducts = 0;
     	try {
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
-                if (numProducts == 100) {
-                  break;
-                }
                 if (s.equals("<doc>")) {
                     long pid = Long.parseLong(fieldFromLine(raf.readLine()));
                     String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
                     String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+                    cat = cat.replace("\\", "/");
+                    name = name.replace("\\", "/");
                     
                     handle.execute("INSERT INTO product_entry VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
-                    numProducts++;
                 }
             }
         } finally {
@@ -146,7 +142,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
 
-            for (int i = 0; i < 100; i++) {//products.getLength(); i++) {
+            for (int i = 0; i < products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();

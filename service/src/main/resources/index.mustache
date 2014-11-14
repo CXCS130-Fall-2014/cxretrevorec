@@ -24,30 +24,37 @@
             </form>
         </div>
     </div>
-    <div id="get_service_call" style="display:none;"><a href="#">link</a></div>
     <div id="get_results" style="width:100%;"></div>
-    <div id="get_review_results" style = "width:100%;"></div>
 </div>
 
 <script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" charset="utf-8">
 
-function recommendProduct(productId) {
-    $("#get_results").html(""); 
+function recommendProduct(productId, productName) {
+    $("#get_results").html("");
     var get_url = "/services/product/v1/review/pid/" + productId + "?format=json";
         $.ajax({
             url: get_url,
             success:function(r) {
-                var output = "This product has no reviews at the moment.";
+                var output = "The product " + productName + " has no reviews at the moment so no recommendation can be made.";
                 if (r.reviewEntry[0] != null) {
-                  var output = "<table><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
+                  var avgRating = 0;
+                  output = "<table><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
                   for(var i =0; i< r.reviewEntry.length; i++) { 
                     output += "<tr><td>" + r.reviewEntry[i].title + "</td>";
                     output += "<td>" + r.reviewEntry[i].comment + "</td>";
                     output += "<td>" + r.reviewEntry[i].rating + "</td>";
                     output += "</tr>";
+                    avgRating += r.reviewEntry[i].rating;
                   }
                   output += "</table>";
+                  avgRating = avgRating/r.reviewEntry.length;
+                  avgRating = avgRating.toFixed(2);
+                  if(avgRating >= 3.5) {
+                    output = "The product " + productName + " has an average rating of " + avgRating + " so it is recommended.<hr>" + output;
+                  } else {  
+                    output = "The product " + productName + " has an average rating of " + avgRating + " so it is NOT recommended.<hr>" + output;
+                  }
                 } 
                 $("#get_results").html(output);
             }
@@ -61,7 +68,6 @@ jQuery(document).ready(function() {
         var productId = $("input[name='productId']", $(this)).val();
 
         var get_url = "/services/product/v1/product/productId/" + productId + "?format=json";
-        $("#get_service_call a").attr('href', get_url).text(get_url).parent().show();
         $.ajax({
             url: get_url,
             success:function(r) {
@@ -69,7 +75,7 @@ jQuery(document).ready(function() {
                 if (r.productEntry[0] != null) {
                   output = "<ol>";
                   for(var i=0; i<r.productEntry.length; i++) {
-                    output += "<li><a onClick='recommendProduct(" + r.productEntry[i].productId+ ");'>" + r.productEntry[i].productName + "</a></li>"; 
+                    output += '<li><a onClick="recommendProduct(' + r.productEntry[i].productId + ', \''+ r.productEntry[i].productName + '\');">' + r.productEntry[i].productName + "</a></li>"; 
                   }
                   output += "</ol>";
                 }

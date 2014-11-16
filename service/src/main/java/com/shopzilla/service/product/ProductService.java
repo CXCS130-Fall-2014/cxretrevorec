@@ -95,7 +95,10 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         // title and comments need single quotes escaped
 
         //Create the two tables, product_entry and reviews
-        handle.execute("create table if not exists product_entry (product_id long not null,product_category varchar(255) not null, product_name varchar(255) not null,primary key (product_id))");
+        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (product_id LONG NOT NULL," + 
+        		"product_category VARCHAR(300) NOT NULL," +
+        		"product_name VARCHAR(300) NOT NULL," +
+        		"primary key (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +

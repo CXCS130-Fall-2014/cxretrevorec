@@ -18,10 +18,18 @@
             <form name="get_product">
 
                 <label for="productName">Product Name</label>
-                <input id="productName" name="productName" value="7581359">
+                <input id="productName" name="productName">
                 <br><br>
                 <input type="submit" name="fetch" value="Fetch">
+
+                <h2>Get Product by Category</h2>
+                <label for="category">Category</label>
+                <select id="categoryList">
+                </select>
+                <br><br>
+                <input type="submit" name="fetch2" value="Fetch">
             </form>
+ 
         </div>
     </div>
     <div id="get_results" style="width:100%;"></div>
@@ -62,52 +70,6 @@ function recommendProduct(productId, productName) {
 }
 
 jQuery(document).ready(function() {
-    $("form[name='get_product']").submit(function(e) {
-        e.preventDefault();
-
-        var productName = $("input[name='productName']", $(this)).val();
-
-        var get_url = "/services/product/v1/product/productName/" + productName + "?format=json";
-        $.ajax({
-            url: get_url,
-            success:function(r) {
-                var output = "There exists no product with this name.";
-                if (r.productEntry[0] != null) {
-                  output = "<ol>";
-                  for(var i=0; i<r.productEntry.length; i++) {
-                    output += '<li><a onClick="recommendProduct(' + r.productEntry[i].productId + ', \''+ r.productEntry[i].productName + '\');">' + r.productEntry[i].productName + "</a></li>"; 
-                  }
-                  output += "</ol>";
-                }
-                $("#get_results").html(output);
-            }
-        });
-    });
-
-});
-</script>
-
-<!-- GET CATEGORY METHOD -->
-<div>
-    <div class="row-fluid">
-        <div class="span5">
-
-            <h2>Get Product by Category</h2>
-            <form name="get_category">
-
-                <label for="category">Category</label>
-                <select id="categoryList">
-                </select>
-                <br><br>
-                <input type="submit" name="fetch" value="Fetch">
-            </form>
-        </div>
-    </div>
-    <div id="get_category_results" style="width:100%;"></div>
-</div>
-
-<script type="text/javascript" charset="utf-8">
-jQuery(document).ready(function() {
     var fill_category_list_url = "/services/product/v1/category/categoryList?format=json";
     $.ajax({
          url: fill_category_list_url,
@@ -122,6 +84,35 @@ jQuery(document).ready(function() {
              list.innerHTML = optionHTML;
          }
     });
+
+    $("form[name='get_product']").submit(function(e) {
+        e.preventDefault();
+
+        var get_url = "";
+        var productName = $("input[name='productName']", $(this)).val();
+        var productList = document.getElementById("categoryList"); 
+        var productCategory = productList.options[productList.selectedIndex].text;
+        if(productName == "" || productName == null) {
+            get_url = "/services/product/v1/product/productCategory/" + productCategory + "?format=json";
+        } else {
+            get_url = "/services/product/v1/product/productName/" + productName + "?format=json";
+        }
+        $.ajax({
+            url: get_url,
+            success:function(r) {
+                var output = "There exists no product with this name/category.";
+                if (r.productEntry[0] != null) {
+                  output = "<ol>";
+                  for(var i=0; i<r.productEntry.length; i++) {
+                    output += '<li><a onClick="recommendProduct(' + r.productEntry[i].productId + ', \''+ r.productEntry[i].productName + '\');">' + r.productEntry[i].productName + "</a></li>"; 
+                  }
+                  output += "</ol>";
+                }
+                $("#get_results").html(output);
+            }
+        });
+    });
+
 });
 </script>
 

@@ -41,6 +41,21 @@ public class HttpProductClient implements ProductClient {
             throw new ProductException(e);
         }
     }
+    
+    @Override
+    public ProductResponse getProductByCategory(ProductQuery query)
+            throws ProductException {
+
+        WebResource request = resource.path(
+                String.format("/productCategory/%d", query.getProductCategory()));
+        try {
+            return request.accept(MediaType.APPLICATION_XML_TYPE).get(ProductResponse.class);
+        } catch (UniformInterfaceException e) {
+            throw new ProductException(e);
+        } catch (ClientHandlerException e) {
+            throw new ProductException(e);
+        }
+    }
 
     @Override
     public CategoryResponse getCategoryList(CategoryQuery query)

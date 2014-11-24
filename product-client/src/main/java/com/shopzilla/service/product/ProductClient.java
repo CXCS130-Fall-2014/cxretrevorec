@@ -12,6 +12,7 @@ import com.shopzilla.site.service.product.model.jaxb.CategoryResponse;
  */
 public interface ProductClient {
     ProductResponse getProductEntries(ProductQuery query) throws ProductException;
+    ProductResponse getProductByCategory(ProductQuery query) throws ProductException;
     CategoryResponse getCategoryList(CategoryQuery query) throws CategoryException;
     ProductResponse createProductEntry(ProductEntry entry) throws ProductException;
     ReviewResponse getReviewEntries(ReviewQuery query) throws ReviewException;

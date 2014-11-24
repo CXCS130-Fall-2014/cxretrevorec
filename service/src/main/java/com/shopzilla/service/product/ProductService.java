@@ -98,6 +98,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         handle.execute("CREATE TABLE IF NOT EXISTS product_entry (product_id LONG NOT NULL," + 
         		"product_category VARCHAR(300) NOT NULL," +
         		"product_name VARCHAR(300) NOT NULL," +
+                        "review_count INTEGER," +
         		"primary key (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
@@ -118,7 +119,8 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     cat = cat.replace("\\", "/");
                     name = name.replace("\\", "/");
                     
-                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name, review_count) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\', 0)"); 
+                    break;
                 }
             }
         } finally {
@@ -141,10 +143,11 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             String title = null;
             String rating = null;
             String comment = null;
+            int review_count = 0;
 
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
-
+           
             for (int i = 0; i < products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
@@ -152,9 +155,10 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     pid = nnm.getNamedItem("PID").getNodeValue();
                     Node child = product.getChildNodes().item(1);
                     NodeList reviews = child.getChildNodes();
-
+                    review_count = 0;
                     for (int j = 0; j < reviews.getLength(); j++) {
                         review = reviews.item(j);
+                        
                         if (review.getNodeType() == Node.ELEMENT_NODE) {
                             NamedNodeMap nnm2 = review.getAttributes();
                             title = nnm2.getNamedItem("Title").getNodeValue();
@@ -169,11 +173,12 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             comment = comment.replace("\\", "/");
                             // some ratings are empty
                             rating = (rating.isEmpty()) ? "NULL" : rating;
-
+                            review_count++;
                             handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
                             rid++;
                         }
                     }
+                    handle.execute("UPDATE product_entry SET review_count = " + review_count + " WHERE product_id = " + pid);
                 }
             }
 

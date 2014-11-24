@@ -7,35 +7,17 @@ package com.shopzilla.service.product;
 import com.google.common.base.Objects;
 
 /**
- * Query parameters for the shopping cart service.
+ * Query parameters for the category service.
  * @author Chris McAndrews
  */
-public class ProductQuery {
+public class CategoryQuery {
 
-    private Long productId;
-    private String productName;
     private String productCategory;
 
-    private ProductQuery() {
+    private CategoryQuery() {
         // use the builder
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-    
     public String getProductCategory() {
         return productCategory;
     }
@@ -56,14 +38,14 @@ public class ProductQuery {
             return false;
         }
 
-        ProductQuery rhs = (ProductQuery) o;
-        return Objects.equal(productId, rhs.productId);
+        CategoryQuery rhs = (CategoryQuery) o;
+        return Objects.equal(productCategory, rhs.productCategory);
     }
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(ProductQuery.class)
-                .add("productId", productId)
+        return Objects.toStringHelper(CategoryQuery.class)
+                .add("productCategory", productCategory)
                 .toString();
     }
 
@@ -73,14 +55,9 @@ public class ProductQuery {
 
     public static class Builder {
 
-        private final ProductQuery q = new ProductQuery();
+        private final CategoryQuery q = new CategoryQuery();
 
-        public Builder productName(String productName) {
-            q.productName = productName;
-            return this;
-        }
-
-        public ProductQuery build() {
+        public CategoryQuery build() {
             return q;
         }
     }

@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import com.google.common.collect.Lists;
 import com.shopzilla.service.product.data.ProductDao;
 import com.shopzilla.service.product.data.ReviewDao;
+import com.shopzilla.service.product.data.CategoryDao;
 import com.shopzilla.service.product.resource.*;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.assets.AssetsBundle;
@@ -63,6 +64,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
          */
         final ProductDao productDao = jdbi.onDemand(ProductDao.class);
         final ReviewDao reviewDao = jdbi.onDemand(ReviewDao.class);
+        final CategoryDao categoryDao = jdbi.onDemand(CategoryDao.class);
 
         /*
         * health checks
@@ -79,6 +81,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
          */
         environment.addResource(new ProductResource(productDao, mapper));
         environment.addResource(new ReviewResource(reviewDao, mapper));
+        environment.addResource(new CategoryResource(categoryDao, mapper));
         environment.addResource(new IndexResource());
     }
 
@@ -110,8 +113,11 @@ public class ProductService extends Service<ProductServiceConfiguration> {
 
         //Import all product data from dataset2.xml
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
+        int items = 0;
     	try {
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
+                if(items == 1000)
+                  break;
                 if (s.equals("<doc>")) {
                     long pid = Long.parseLong(fieldFromLine(raf.readLine()));
                     String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
@@ -120,7 +126,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     name = name.replace("\\", "/");
                     
                     handle.execute("MERGE INTO product_entry (product_id, product_category, product_name, review_count) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\', 0)"); 
-                    break;
+                    items++;
                 }
             }
         } finally {
@@ -148,7 +154,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
            
-            for (int i = 0; i < products.getLength(); i++) {
+            for (int i = 0; i < 1000; i++) {//products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();

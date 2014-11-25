@@ -41,6 +41,7 @@
 <script type="text/javascript" charset="utf-8">
 
 function recommendProduct(productId, productName) {
+    //Hide the list of products and show the back button and reviews
     $("#get_results").hide(30);
     $("#result_button").show();
     $("#get_review_results").show(30);
@@ -74,12 +75,15 @@ function recommendProduct(productId, productName) {
         });
 }
 
+//If the back button is clicked, show the list of products and hide reviews
 $("#result_button").click(function() {
     $("#get_results").show(100);
     $("#get_review_results").hide(100);
     $("#result_button").hide();
 });
 
+//When the document is loaded, look at the product table and 
+//fill the drop down list with the distinct categories
 jQuery(document).ready(function() {
     $("#result_button").hide();
     var fill_category_list_url = "/services/product/v1/category/categoryList?format=json";
@@ -127,68 +131,6 @@ jQuery(document).ready(function() {
 
 });
 </script>
-
-
-<!--GET REVIEWS METHOD
-var get_url = "/services/product/v1/review/pid/" + productId + "?format=json";
-        $.ajax({
-            url: get_url,
-            success:function(r) {
-                var output = "This product has no reviews at the moment.";
-                if (r.reviewEntry[0] != null) {
-                  var output = "<table><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
-                  for(var i =0; i< r.reviewEntry.length; i++) { 
-                    output += "<tr><td>" + r.reviewEntry[i].title + "</td>";
-                    output += "<td>" + r.reviewEntry[i].comment + "</td>";
-                    output += "<td>" + r.reviewEntry[i].rating + "</td>";
-                    output += "</tr>";
-                  }
-                  output += "</table>";
-                } 
-                $("#get_review_results").html(output);
-            }
-        });
-
-<div>
-    <div class="row-fluid">
-        <div class="span5">
-
-            <h2>Get Reviews</h2>
-            <form name="get_review">
-
-                <label for="pid">Pid</label>
-                <input id="pid" name="pid" value="4198654574">
-                <br><br>
-                <input type="submit" name="fetch" value="Fetch">
-            </form>
-        </div>
-    </div>
-    <div id="get_review_service_call" style="display:none;"><a href="#">link</a></div>
-    <div id="get_review_results" style="width:100%;"/>
-</div>
-
-<script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
-<script type="text/javascript" charset="utf-8">
-jQuery(document).ready(function() {
-    $("form[name='get_review']").submit(function(e) {
-        e.preventDefault();
-
-        var pid = $("input[name='pid']", $(this)).val();
-
-        var get_url = "/services/product/v1/review/pid/" + pid + "?format=json";
-        $("#get_review_service_call a").attr('href', get_url).text(get_url).parent().show();
-        $.ajax({
-            url: get_url,
-            success:function(r) {
-                var output = "The review's pid is " + r.reviewEntry[0].pid +" and it's title is " + r.reviewEntry[0].title + " and the rating is " + r.reviewEntry[0].rating + " and the comment is " + r.reviewEntry[0].comment + "."; 
-                $("#get_review_results").html("<pre>" + output + "</pre>");
-            }
-        });
-    });
-
-});
-</script> 
--->
 
 <!-- CREATE METHOD -->
 

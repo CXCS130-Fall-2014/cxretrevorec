@@ -113,11 +113,8 @@ public class ProductService extends Service<ProductServiceConfiguration> {
 
         //Import all product data from dataset2.xml
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
-        int items = 0;
     	try {
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
-                if(items == 1000)
-                  break;
                 if (s.equals("<doc>")) {
                     long pid = Long.parseLong(fieldFromLine(raf.readLine()));
                     String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
@@ -126,7 +123,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     name = name.replace("\\", "/");
                     
                     handle.execute("MERGE INTO product_entry (product_id, product_category, product_name, review_count) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\', 0)"); 
-                    items++;
                 }
             }
         } finally {
@@ -154,7 +150,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
            
-            for (int i = 0; i < 1000; i++) {//products.getLength(); i++) {
+            for (int i = 0; i < products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();
@@ -184,6 +180,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             rid++;
                         }
                     }
+                    //Update product table with # of reviews
                     handle.execute("UPDATE product_entry SET review_count = " + review_count + " WHERE product_id = " + pid);
                 }
             }

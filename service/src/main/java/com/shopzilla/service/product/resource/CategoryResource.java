@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
- * Controller for handling CRUD operations for a product.
+ * Controller for handling CRUD operations for a category.
  * @author Chris McAndrews
  */
 @Path("/category")

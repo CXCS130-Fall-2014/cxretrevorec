@@ -27,6 +27,7 @@ public class HttpProductClient implements ProductClient {
         this.resource = resource;
     }
 
+    //Get products by name
     @Override
     public ProductResponse getProductEntries(ProductQuery query)
             throws ProductException {
@@ -42,6 +43,7 @@ public class HttpProductClient implements ProductClient {
         }
     }
     
+    //Get products by category
     @Override
     public ProductResponse getProductByCategory(ProductQuery query)
             throws ProductException {
@@ -57,6 +59,7 @@ public class HttpProductClient implements ProductClient {
         }
     }
 
+    //Get a list of distinct categories in the current product table
     @Override
     public CategoryResponse getCategoryList(CategoryQuery query)
             throws CategoryException {

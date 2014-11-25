@@ -79,7 +79,7 @@ public class ProductResource {
         ProductResponse response = new ProductResponse();
         ProductQuery query = ProductQuery.builder().productCategory(productCategory).build();
         List<com.shopzilla.service.product.data.ProductEntry> daoResults =
-                dao.getProductEntries(query);
+                dao.getProductByCategory(query);
         for (com.shopzilla.service.product.data.ProductEntry product : daoResults) {
             response.getProductEntry().add(mapper.map(product, ProductEntry.class));
         }

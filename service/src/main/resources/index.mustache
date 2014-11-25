@@ -32,14 +32,19 @@
  
         </div>
     </div>
+    <button id="result_button" type="button">Back</button>
     <div id="get_results" style="width:100%;"></div>
+    <div id="get_review_results" style="width:100%;"></div>
 </div>
 
 <script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" charset="utf-8">
 
 function recommendProduct(productId, productName) {
-    $("#get_results").html("");
+    $("#get_results").hide(30);
+    $("#result_button").show();
+    $("#get_review_results").show(30);
+
     var get_url = "/services/product/v1/review/pid/" + productId + "?format=json";
         $.ajax({
             url: get_url,
@@ -64,12 +69,19 @@ function recommendProduct(productId, productName) {
                     output = "The product " + productName + " has an average rating of " + avgRating + " so it is NOT recommended.<hr>" + output;
                   }
                 } 
-                $("#get_results").html(output);
+                $("#get_review_results").html(output);
             }
         });
 }
 
+$("#result_button").click(function() {
+    $("#get_results").show(100);
+    $("#get_review_results").hide(100);
+    $("#result_button").hide();
+});
+
 jQuery(document).ready(function() {
+    $("#result_button").hide();
     var fill_category_list_url = "/services/product/v1/category/categoryList?format=json";
     $.ajax({
          url: fill_category_list_url,
@@ -87,7 +99,7 @@ jQuery(document).ready(function() {
 
     $("form[name='get_product']").submit(function(e) {
         e.preventDefault();
-
+        $("#result_button").hide();
         var get_url = "";
         var productName = $("input[name='productName']", $(this)).val();
         var productList = document.getElementById("categoryList"); 

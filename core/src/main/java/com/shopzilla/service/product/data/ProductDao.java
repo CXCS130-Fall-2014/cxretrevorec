@@ -29,7 +29,7 @@ public interface ProductDao extends Transactional<ProductDao> {
 
     /* Get By Category */
     @SqlQuery(
-            "SELECT * FROM product_entry WHERE product_category LIKE ':q.productCategory'"
+            "SELECT * FROM product_entry WHERE product_category = :q.productCategory "
     )
     public List<ProductEntry> getProductByCategory(@BindBean("q") ProductQuery query);
 

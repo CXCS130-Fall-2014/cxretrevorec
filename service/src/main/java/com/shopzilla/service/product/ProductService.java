@@ -95,14 +95,19 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         // title and comments need single quotes escaped
 
         //Create the two tables, product_entry and reviews
-        handle.execute("create table if not exists product_entry (product_id long not null,product_category varchar(255) not null, product_name varchar(255) not null,primary key (product_id))");
+        handle.execute("DROP ALL OBJECTS");
+        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (" +
+                "product_id long NOT NULL," +
+                "product_category varchar(255) NOT NULL," +
+                "product_name varchar(255) NOT NULL," +
+                "PRIMARY KEY (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
                 "title VARCHAR(250) NOT NULL," +
                 "rating INTEGER," +
                 "comment VARCHAR(3000) NOT NULL," +
-                "primary key (rid))");
+                "PRIMARY KEY (rid))");
 
         //Import all product data from dataset2.xml
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
@@ -114,8 +119,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
                     cat = cat.replace("\\", "/");
                     name = name.replace("\\", "/");
-                    
-                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) KEY(product_id) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
                 }
             }
         } finally {
@@ -168,7 +172,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             rating = (rating.isEmpty()) ? "NULL" : rating;
 
                             String output = pid + title + rating + comment;
-                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
+                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) KEY(rid) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
                             rid++;
                         }
                     }

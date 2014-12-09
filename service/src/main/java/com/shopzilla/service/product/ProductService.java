@@ -6,6 +6,11 @@ package com.shopzilla.service.product;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.Long;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import com.google.common.collect.Lists;
 import com.shopzilla.service.product.data.ProductDao;
 import com.shopzilla.service.product.data.ReviewDao;
@@ -99,7 +104,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         handle.execute("CREATE TABLE IF NOT EXISTS product_entry (" +
                 "product_id long NOT NULL," +
                 "product_category varchar(255) NOT NULL," +
-                "product_name varchar(255) NOT NULL," +
+                "product_name varchar(255) NOT NULL UNIQUE," +
                 "PRIMARY KEY (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
@@ -109,7 +114,10 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 "comment VARCHAR(3000) NOT NULL," +
                 "PRIMARY KEY (rid))");
 
+        System.out.println("Start loading products");
+
         //Import all product data from dataset2.xml
+        Hashtable<Long, Long> conflicts = new Hashtable<Long, Long>();
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
     	try {
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
@@ -119,12 +127,27 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
                     cat = cat.replace("\\", "/");
                     name = name.replace("\\", "/");
-                    handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) KEY(product_id) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+
+                    String select = "SELECT product_id, product_name FROM product_entry " +
+                            "WHERE product_name='" + name + "' LIMIT 1";
+                    List<Map<String, Object>> rs = handle.select(select);
+                    if (rs.isEmpty()) {
+                        // New product
+                        handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) KEY(product_id) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                    } else {
+                        // Existing product
+                        Map<String, Object> row = rs.get(0);
+                        Long originalId = (Long) row.get("product_id");
+                        Long conflictId = new Long(pid);
+                        conflicts.put(conflictId, originalId);
+                    }
                 }
             }
         } finally {
             raf.close();
         }
+
+        System.out.println("Finished loading products");
 
         //Import review data from dataset.xml
         Document dom;
@@ -151,6 +174,10 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();
                     pid = nnm.getNamedItem("PID").getNodeValue();
+                    Long longPid = Long.parseLong(pid);
+                    if (conflicts.containsKey(longPid)) {
+                        pid = conflicts.get(longPid).toString();
+                    }
                     Node child = product.getChildNodes().item(1);
                     NodeList reviews = child.getChildNodes();
 

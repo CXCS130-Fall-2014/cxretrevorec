@@ -7,7 +7,6 @@ package com.shopzilla.service.product;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.Long;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -192,14 +191,13 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             // single quotes are escaped by single quotes in h2
                             title = title.replace("'", "''");
                             comment = comment.replace("'", "''");
-                            // backslashs cause problems in h2
+                            // backslashes cause problems in h2
                             title = title.replace("\\", "/");
                             comment = comment.replace("\\", "/");
                             // some ratings are empty
                             rating = (rating.isEmpty()) ? "NULL" : rating;
 
-                            String output = pid + title + rating + comment;
-                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) KEY(rid) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
+                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
                             rid++;
                         }
                     }
@@ -209,9 +207,9 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             return true;
 
         } catch (ParserConfigurationException pce) {
-            System.out.println(pce.getMessage());
+            System.err.println(pce.getMessage());
         } catch (SAXException se) {
-            System.out.println(se.getMessage());
+            System.err.println(se.getMessage());
         } catch (IOException ioe) {
             System.err.println(ioe.getMessage());
         }

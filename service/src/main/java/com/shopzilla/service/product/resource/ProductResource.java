@@ -63,6 +63,30 @@ public class ProductResource {
         return buildResponse(response, format);
     }
 
+    @Timed(name = "getProductByCategory")
+    @GET
+    @JSONP
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Path("productCategory/{productCategory}")
+    public Response getCategory(@PathParam("productCategory") String productCategory,
+                        @QueryParam("format") Format format) {
+
+        if (productCategory == null) {
+            LOG.debug("A valid product category must be provided");
+            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+        }
+
+        ProductResponse response = new ProductResponse();
+        ProductQuery query = ProductQuery.builder().productCategory(productCategory).build();
+        List<com.shopzilla.service.product.data.ProductEntry> daoResults =
+                dao.getProductByCategory(query);
+        for (com.shopzilla.service.product.data.ProductEntry product : daoResults) {
+            response.getProductEntry().add(mapper.map(product, ProductEntry.class));
+        }
+        return buildResponse(response, format);
+    }
+
+
     @Timed(name = "createProduct")
     @POST
     @JSONP

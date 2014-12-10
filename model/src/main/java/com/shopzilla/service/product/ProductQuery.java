@@ -14,6 +14,7 @@ public class ProductQuery {
 
     private Long productId;
     private String productName;
+    private String productCategory;
 
     private ProductQuery() {
         // use the builder
@@ -33,6 +34,14 @@ public class ProductQuery {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+    
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
     }
 
     @Override
@@ -70,7 +79,11 @@ public class ProductQuery {
             q.productName = productName;
             return this;
         }
-
+        
+        public Builder productCategory(String productCategory) {
+            q.productCategory = productCategory;
+            return this;
+        }
         public ProductQuery build() {
             return q;
         }

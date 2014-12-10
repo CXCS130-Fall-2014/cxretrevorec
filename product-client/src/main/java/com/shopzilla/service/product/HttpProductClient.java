@@ -9,6 +9,8 @@ import com.shopzilla.site.service.product.model.jaxb.ProductEntry;
 import com.shopzilla.site.service.product.model.jaxb.ProductResponse;
 import com.shopzilla.site.service.product.model.jaxb.ReviewEntry;
 import com.shopzilla.site.service.product.model.jaxb.ReviewResponse;
+import com.shopzilla.site.service.product.model.jaxb.CategoryEntry;
+import com.shopzilla.site.service.product.model.jaxb.CategoryResponse;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -25,6 +27,7 @@ public class HttpProductClient implements ProductClient {
         this.resource = resource;
     }
 
+    //Get products by name
     @Override
     public ProductResponse getProductEntries(ProductQuery query)
             throws ProductException {
@@ -37,6 +40,37 @@ public class HttpProductClient implements ProductClient {
             throw new ProductException(e);
         } catch (ClientHandlerException e) {
             throw new ProductException(e);
+        }
+    }
+    
+    //Get products by category
+    @Override
+    public ProductResponse getProductByCategory(ProductQuery query)
+            throws ProductException {
+
+        WebResource request = resource.path(
+                String.format("/productCategory/%d", query.getProductCategory()));
+        try {
+            return request.accept(MediaType.APPLICATION_XML_TYPE).get(ProductResponse.class);
+        } catch (UniformInterfaceException e) {
+            throw new ProductException(e);
+        } catch (ClientHandlerException e) {
+            throw new ProductException(e);
+        }
+    }
+
+    //Get a list of distinct categories in the current product table
+    @Override
+    public CategoryResponse getCategoryList(CategoryQuery query)
+            throws CategoryException {
+
+        WebResource request = resource.path("/categoryList");
+        try {
+            return request.accept(MediaType.APPLICATION_XML_TYPE).get(CategoryResponse.class);
+        } catch (UniformInterfaceException e) {
+            throw new CategoryException(e);
+        } catch (ClientHandlerException e) {
+            throw new CategoryException(e);
         }
     }
 

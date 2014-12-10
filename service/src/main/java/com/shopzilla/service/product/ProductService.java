@@ -13,6 +13,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.shopzilla.service.product.data.ProductDao;
 import com.shopzilla.service.product.data.ReviewDao;
+import com.shopzilla.service.product.data.CategoryDao;
 import com.shopzilla.service.product.resource.*;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.assets.AssetsBundle;
@@ -67,6 +68,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
          */
         final ProductDao productDao = jdbi.onDemand(ProductDao.class);
         final ReviewDao reviewDao = jdbi.onDemand(ReviewDao.class);
+        final CategoryDao categoryDao = jdbi.onDemand(CategoryDao.class);
 
         /*
         * health checks
@@ -83,6 +85,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
          */
         environment.addResource(new ProductResource(productDao, mapper));
         environment.addResource(new ReviewResource(reviewDao, mapper));
+        environment.addResource(new CategoryResource(categoryDao, mapper));
         environment.addResource(new IndexResource());
     }
 
@@ -100,11 +103,11 @@ public class ProductService extends Service<ProductServiceConfiguration> {
 
         //Create the two tables, product_entry and reviews
         handle.execute("DROP ALL OBJECTS");
-        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (" +
-                "product_id long NOT NULL," +
-                "product_category varchar(255) NOT NULL," +
-                "product_name varchar(255) NOT NULL UNIQUE," +
-                "PRIMARY KEY (product_id))");
+        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (product_id LONG NOT NULL," + 
+        		"product_category VARCHAR(300) NOT NULL," +
+        		"product_name VARCHAR(300) NOT NULL," +
+                        "review_count INTEGER," +
+        		"primary key (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
@@ -126,7 +129,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
                     cat = cat.replace("\\", "/");
                     name = name.replace("\\", "/");
-
                     String select = "SELECT product_id, product_name FROM product_entry " +
                             "WHERE product_name='" + name + "' LIMIT 1";
                     List<Map<String, Object>> rs = handle.select(select);
@@ -164,10 +166,11 @@ public class ProductService extends Service<ProductServiceConfiguration> {
             String title = null;
             String rating = null;
             String comment = null;
+            int review_count = 0;
 
             Node product, review;
             NodeList products = dom.getFirstChild().getChildNodes();
-
+           
             for (int i = 0; i < products.getLength(); i++) {
                 product = products.item(i);
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
@@ -179,9 +182,10 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     }
                     Node child = product.getChildNodes().item(1);
                     NodeList reviews = child.getChildNodes();
-
+                    review_count = 0;
                     for (int j = 0; j < reviews.getLength(); j++) {
                         review = reviews.item(j);
+                        
                         if (review.getNodeType() == Node.ELEMENT_NODE) {
                             NamedNodeMap nnm2 = review.getAttributes();
                             title = nnm2.getNamedItem("Title").getNodeValue();
@@ -196,11 +200,13 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             comment = comment.replace("\\", "/");
                             // some ratings are empty
                             rating = (rating.isEmpty()) ? "NULL" : rating;
-
+                            review_count++;
                             handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
                             rid++;
                         }
                     }
+                    //Update product table with # of reviews
+                    handle.execute("UPDATE product_entry SET review_count = " + review_count + " WHERE product_id = " + pid);
                 }
             }
 

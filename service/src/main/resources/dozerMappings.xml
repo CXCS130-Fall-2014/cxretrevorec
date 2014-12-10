@@ -46,4 +46,13 @@
     </field>
   </mapping>
 
+  <mapping>
+    <class-a>com.shopzilla.service.product.data.CategoryEntry</class-a>
+    <class-b>com.shopzilla.site.service.product.model.jaxb.CategoryEntry</class-b>
+    <field>
+      <a>productCategory</a>
+      <b>productCategory</b>
+    </field>
+  </mapping>
+
 </mappings>

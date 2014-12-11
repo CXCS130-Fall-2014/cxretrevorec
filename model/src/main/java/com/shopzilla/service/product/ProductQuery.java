@@ -15,6 +15,9 @@ public class ProductQuery {
     private Long productId;
     private String productName;
     private String productCategory;
+    private Long productUPC;
+    private String productDescription;
+    private Long productPrice;
 
     private ProductQuery() {
         // use the builder
@@ -42,6 +45,30 @@ public class ProductQuery {
 
     public void setProductCategory(String productCategory) {
         this.productCategory = productCategory;
+    }
+
+    public Long getProductUPC() {
+        return productUPC;
+    }
+
+    public void setProductUPC(Long productUPC) {
+        this.productUPC = productUPC;
+    }
+
+    public String getProductDescription() {
+        return productDescription;
+    }
+
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
+    }
+
+    public Long getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(Long productPrice) {
+        this.productPrice = productPrice;
     }
 
     @Override
@@ -82,6 +109,11 @@ public class ProductQuery {
         
         public Builder productCategory(String productCategory) {
             q.productCategory = productCategory;
+            return this;
+        }
+
+        public Builder productDescription(String productDescription) {
+            q.productDescription = productDescription;
             return this;
         }
         public ProductQuery build() {

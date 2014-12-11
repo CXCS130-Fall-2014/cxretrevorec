@@ -20,6 +20,9 @@ public class ProductEntry {
     private Long productId;
     private String productName;
     private String productCategory;
+    private Long productUPC;
+    private String productDescription;
+    private Long productPrice;
 
     public Long getProductId() {
         return productId;
@@ -45,6 +48,30 @@ public class ProductEntry {
         this.productCategory = productCategory;
     }
 
+    public Long getProductUPC() {
+        return productUPC;
+    }
+
+    public void setProductUPC(Long productUPC) {
+        this.productUPC = productUPC;
+    }
+
+    public String getProductDescription() {
+        return productDescription;
+    }
+
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
+    }
+
+    public Long getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(Long productPrice) {
+        this.productPrice = productPrice;
+    }
+
     /**
      * Map database rows to the {@link com.shopzilla.service.product.data.ProductEntry} class.
      */
@@ -55,6 +82,9 @@ public class ProductEntry {
             toReturn.setProductId(rs.getLong("product_id"));
             toReturn.setProductName(rs.getString("product_name"));
             toReturn.setProductCategory(rs.getString("product_category"));
+            toReturn.setProductUPC(rs.getLong("product_upc"));
+            toReturn.setProductDescription(rs.getString("product_description"));
+            toReturn.setProductPrice(rs.getLong("product_price"));
             return toReturn;
         }
     }

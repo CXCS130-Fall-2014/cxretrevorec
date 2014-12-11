@@ -110,7 +110,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         try {
             ret = Long.parseLong(input);
         } catch (NumberFormatException nfe) {
-            System.err.println(nfe.getMessage());
             return "NULL";
         }
         return ret.toString();
@@ -165,7 +164,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     description = name.replace("\\", "/");
                     cat = cat.replace("\\", "/");
                     String merge = "MERGE INTO product_entry (product_id, product_name, product_description, product_price, product_upc, product_category, product_ean13, review_count) KEY(product_id) VALUES (" + pid + ", \'" + name + "\', \'" + description + "\', " + price + ", " + upc + ", \'" + cat + "\', " + ean13 + ", 0)";
-                    System.out.println(merge);
                     handle.execute(merge);
                 }
             }
@@ -230,7 +228,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             rating = (rating.isEmpty()) ? "NULL" : rating;
                             review_count++;
                             String merge = "MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')";
-                            System.out.println(merge);
                             handle.execute(merge);
                             rid++;
                         }

@@ -42,6 +42,7 @@ div {
     </div>
     <button id="result_button" type="button" class="btn btn-danger">Go Back</button>
     <div id="get_results" style="width:100%;"></div>
+    <div id="get_test_results2"</div>
     <div id="get_review_results" style="width:100%; padding-bottom:5%"></div>
 </div>
 
@@ -53,7 +54,18 @@ function recommendProduct(productId, productName) {
     $("#get_results").hide(30);
     $("#result_button").show();
     $("#get_review_results").show(30);
-
+    var get_url = "/services/product/v1/amazon/upc/123?format=json";
+         $.ajax({
+            url: get_url,
+            dataType: "xml",
+            success:function(r) {
+               var sr = $(r).find("SalesRank").text();
+               var amazon_url = $(r).find("DetailPageURL").text();
+               var image_url = $(r).find("ImageSets > ImageSet > SmallImage > URL").text();
+               var price = $(r).find("OfferSummary > LowestUsedPrice > FormattedPrice").text();
+               $("#get_test_results2").html("done");
+            }
+        });
     var get_url = "/services/product/v1/review/pid/" + productId + "?format=json";
         $.ajax({
             url: get_url,

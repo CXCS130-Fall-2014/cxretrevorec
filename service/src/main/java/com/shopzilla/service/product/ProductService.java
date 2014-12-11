@@ -86,6 +86,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         environment.addResource(new ProductResource(productDao, mapper));
         environment.addResource(new ReviewResource(reviewDao, mapper));
         environment.addResource(new CategoryResource(categoryDao, mapper));
+        environment.addResource(new AmazonResource());
         environment.addResource(new IndexResource());
     }
 

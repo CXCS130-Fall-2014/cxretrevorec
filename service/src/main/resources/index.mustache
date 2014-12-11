@@ -41,8 +41,8 @@ div {
         </div>
     </div>
     <button id="result_button" type="button" class="btn btn-danger">Go Back</button>
-    <div id="get_results" style="width:100%; padding-left: 10%"></div>
-    <div id="get_review_results" style="width:100%; padding-left:10%"></div>
+    <div id="get_results" style="width:100%;"></div>
+    <div id="get_review_results" style="width:100%; padding-bottom:5%"></div>
 </div>
 
 <script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
@@ -61,7 +61,7 @@ function recommendProduct(productId, productName) {
                 var output = "The product " + productName + " has no reviews at the moment so no recommendation can be made.";
                 if (r.reviewEntry[0] != null) {
                   var avgRating = 0;
-                  output = "<table><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
+                  output = "<table class=\"table table-bordered\"><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
                   for(var i =0; i< r.reviewEntry.length; i++) { 
                     output += "<tr><td>" + r.reviewEntry[i].title + "</td>";
                     output += "<td>" + r.reviewEntry[i].comment + "</td>";

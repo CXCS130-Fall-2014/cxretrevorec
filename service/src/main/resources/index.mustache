@@ -11,7 +11,7 @@
 
 <!-- GET METHOD -->
 <div>
-    <div class="row-fluid">
+    <div class="row-fluid"> <!-- row-fluid span6" style="width: 50%; float: left" -->
         <div class="span5">
 
             <h2>Get Product</h2>
@@ -20,16 +20,16 @@
                 <label for="productName">Product Name</label>
                 <input id="productName" name="productName">
                 <br><br>
-                <input type="submit" name="fetch" value="Fetch">
+                <input type="submit" name="fetch" value="Fetch" class="btn btn-success">
 
                 <h2>Get Product by Category</h2>
                 <label for="category">Category</label>
                 <select id="categoryList">
                 </select>
                 <br><br>
-                <input type="submit" name="fetch2" value="Fetch">
+                <input type="submit" name="fetch2" value="Fetch" class="btn btn-success">
             </form>
- 
+
         </div>
     </div>
     <button id="result_button" type="button">Back</button>
@@ -132,7 +132,7 @@ jQuery(document).ready(function() {
 });
 </script>
 
-<!-- CREATE METHOD -->
+<!-- CREATE METHOD
 
 <div>
     <div class="row-fluid">
@@ -159,6 +159,7 @@ jQuery(document).ready(function() {
     <div id="create_results" style="width:100%;"/>
 </div>
 
+-->
 <script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" charset="utf-8">
     jQuery(document).ready(function() {

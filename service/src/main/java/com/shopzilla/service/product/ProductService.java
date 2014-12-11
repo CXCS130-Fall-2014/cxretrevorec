@@ -57,7 +57,9 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 "h2");
         Handle handle = jdbi.open();
         // This is so I can change my table
+
         loadData(handle);
+
 
         /*
          * "real" database DAO
@@ -98,6 +100,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         // title and comments need single quotes escaped
 
         //Create the two tables, product_entry and reviews
+        handle.execute("drop all objects");
         handle.execute("CREATE TABLE IF NOT EXISTS product_entry (product_id LONG NOT NULL," + 
         		"product_category VARCHAR(300) NOT NULL," +
         		"product_name VARCHAR(300) NOT NULL," +

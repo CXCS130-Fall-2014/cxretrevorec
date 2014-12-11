@@ -36,11 +36,12 @@ div {
                 </select>
                 <br><br>
                 <input type="submit" name="fetch2" value="Fetch" class="btn btn-primary">
+
+                <button id="result_button" type="button" class="btn btn-danger">Go Back</button>
             </form>
  
         </div>
     </div>
-    <button id="result_button" type="button" class="btn btn-danger">Go Back</button>
     <div id="get_results" style="width:100%;"></div>
     <div id="get_review_results" style="width:100%; padding-bottom:5%"></div>
 </div>
@@ -54,7 +55,6 @@ function recommendProduct(productId, productName, productUPC, productDescription
     $("#get_results").hide(30);
     $("#result_button").show();
     $("#get_review_results").show(30);
-
     var review_url = "/services/product/v1/review/pid/" + productId + "?format=json";
     var reviewData;
         $.ajax({
@@ -63,32 +63,38 @@ function recommendProduct(productId, productName, productUPC, productDescription
                 reviewData = r;
            }
         });
-
-//    var amazon_url = "/services/product/v1/amazon/upc/" + productUPC + "?format=json";
-    var amazonData;
-//    $.ajax({
-//        url: amazon_url,
-//        success:function(a) {
-//            amazonData = a;
-//        }
-//    });
-
+    var amazonData = {
+        sr:"",
+        amazonUrl:"",
+        imageUrl:"",
+        amazonPrice:""
+    };
+    var get_url = "/services/product/v1/amazon/upc/" + productUPC + "?format=json";
+         $.ajax({
+            url: get_url,
+            dataType: "xml",
+            success:function(r) {
+               amazonData.sr = $(r).find("SalesRank").text();
+               amazonData.amazonUrl = $(r).find("DetailPageURL").text();
+               amazonData.imageUrl = $(r).find("ImageSets > ImageSet > SmallImage > URL").text();
+               amazonData.amazonPrice = $(r).find("OfferSummary > LowestUsedPrice > FormattedPrice").text();
+            }
+        });
+ 
     $(document).ajaxStop(function() {
 
         var salesRank;
-        var promotion;
+        //var promotion;
         var amazonUrl;
         var imageUrl;
         var amazonPrice;
-        var editorialReview;
+        //var editorialReview;
 
         if (amazonData != null) {
-            salesRank = amazonData.amazonEntry[0].salesRank;
-            promotion = amazonData.amazonEntry[0].promotion;
-            amazonUrl = amazonData.amazonEntry[0].amazonUrl;
-            imageUrl = amazonData.amazonEntry[0].imageUrl;
-            amazonPrice = amazonData.amazonEntry[0].amazonPrice;
-            editorialReview = amazonData.amazonEntry[0].editorialReview;
+            salesRank = amazonData.sr;
+            amazonUrl = amazonData.amazonUrl;
+            imageUrl = amazonData.imageUrl;
+            amazonPrice = amazonData.amazonPrice;
         }
 
         var avgRating;
@@ -148,10 +154,12 @@ function recommendProduct(productId, productName, productUPC, productDescription
             }
 
             price = productPrice.toString();
+            price = "$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2);
         } else {
             rec = "No Information";
             confidence = 0;
             price = productPrice.toString();
+            price = "$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2);
         }
 
         //Construct table from rec, confidence, productDescription, price, and optionally salesrank and promotion
@@ -167,7 +175,7 @@ function recommendProduct(productId, productName, productUPC, productDescription
         table += "<tr><td>Confidence:</td><td>" + confidence + "/5</td></tr>";
         table += "<tr><td>Average Rating:</td><td>" + avgRating + "</td></tr>";
         table += "<tr><td>Number of Ratings:</td><td>" + numRatings + "</td></tr>";
-        table += "<tr><td>Price:</td><td>$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2) + "</td></tr></table>";
+        table += "<tr><td>Price:</td><td>" + price + "</td></tr></table>";
 
 
         output = table + output;

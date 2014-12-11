@@ -96,6 +96,15 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         return xmlLine.substring(start, end);
     }
 
+    String getCategoryValue(String in) {
+        int start = in.indexOf(">")+1;
+        int end = in.indexOf("&", start);
+        if(end < 0) {
+            return "other";
+        }
+        return in.substring(start, end);
+    }
+
     String getLongValue(String input) {
         Long ret;
         try {
@@ -149,7 +158,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     // Skip sku_norm
                     raf.readLine();
                     String upc = getLongValue(fieldFromLine(raf.readLine()));
-                    String cat = fieldFromLine(raf.readLine());
+                    String cat = getCategoryValue(raf.readLine());
                     String ean13 = getLongValue(fieldFromLine(raf.readLine()));
 
                     name = name.replace("\\", "/");

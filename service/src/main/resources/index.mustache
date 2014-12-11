@@ -86,20 +86,13 @@ $("#result_button").click(function() {
 //fill the drop down list with the distinct categories
 jQuery(document).ready(function() {
     $("#result_button").hide();
-    var fill_category_list_url = "/services/product/v1/category/categoryList?format=json";
-    $.ajax({
-         url: fill_category_list_url,
-         success:function(r) {
-             var list = document.getElementById("categoryList");
-             var optionHTML = "";
-             if(r.categoryEntry[0] != null) {
-                 for(var i=0; i<r.categoryEntry.length; i++) {
-                     optionHTML += "<option value='" + r.categoryEntry[i].productCategory + "'>" + r.categoryEntry[i].productCategory + "</option>";
-                 }
-             }
-             list.innerHTML = optionHTML;
-         }
-    });
+
+    var list = document.getElementById("categoryList");
+    var optionHTML = "<option value='automotive'>Automotive</option>" +
+                     "<option value='electronics'>Electronics</option>" +
+                     "<option value='other'>Other</option>" +
+                     "<option value='video games'>Video Games</option>";
+    list.innerHTML = optionHTML;
 
     $("form[name='get_product']").submit(function(e) {
         e.preventDefault();
@@ -107,7 +100,7 @@ jQuery(document).ready(function() {
         var get_url = "";
         var productName = $("input[name='productName']", $(this)).val();
         var productList = document.getElementById("categoryList"); 
-        var productCategory = productList.options[productList.selectedIndex].text;
+        var productCategory = productList.options[productList.selectedIndex].value;
         if(productName == "" || productName == null) {
             get_url = "/services/product/v1/product/productCategory/" + productCategory + "?format=json";
         } else {

@@ -99,7 +99,7 @@ function recommendProduct(productId, productName, productUPC, productDescription
             avgRating = 0;
             numRatings = reviewData.reviewEntry.length;
 
-            output = "<table class=\"table table-bordered\"><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
+            output = "<table class=\"table table-bordered\"><tr><th>Review Title</th><th>Comment</th><th>Rating</th></tr>";
             for(var i =0; i< reviewData.reviewEntry.length; i++) {
                 output += "<tr><td>" + reviewData.reviewEntry[i].title + "</td>";
                 output += "<td>" + reviewData.reviewEntry[i].comment + "</td>";
@@ -120,18 +120,18 @@ function recommendProduct(productId, productName, productUPC, productDescription
 
             rec = "Buy!";
             confidence = 5;
-            price = amazonPrice;
+            price = amazonPrice.toString();
 
         } else if (amazonData != null) {
             //MAGIC AMAZON SHITTTTTTT
             rec = "Buy!";
             confidence = 5;
-            price = amazonPrice;
+            price = amazonPrice.toString();
 
         } else if (reviewData.reviewEntry[0] != null) {
             if (numRatings >= 1000) {
                 confidence = 5;
-            } else if (numRatings >= 100) {
+            } else if (numRatings >= 30) {
                 confidence = 4;
             } else if (numRatings >= 10) {
                 confidence = 3;
@@ -147,11 +147,11 @@ function recommendProduct(productId, productName, productUPC, productDescription
                 rec = "Don't Buy!";
             }
 
-            price = productPrice;
+            price = productPrice.toString();
         } else {
             rec = "No Information";
             confidence = 0;
-            price = productPrice;
+            price = productPrice.toString();
         }
 
         //Construct table from rec, confidence, productDescription, price, and optionally salesrank and promotion
@@ -161,7 +161,16 @@ function recommendProduct(productId, productName, productUPC, productDescription
         //price is a price in format 999 for $9.99
         //end with output = [your table] + output;
 
-        output = "Stuff: " + rec + " " + confidence + " " + productDescription + " " + price + "<hr>" + output;
+        var table = "<table class=\"table table-bordered\">";
+        table += "<tr><td>Product:</td><td>" + productName + "</td></tr>";
+        table += "<tr><td>Recommendation:</td><td>" + rec + "</td></tr>";
+        table += "<tr><td>Confidence:</td><td>" + confidence + "/5</td></tr>";
+        table += "<tr><td>Average Rating:</td><td>" + avgRating + "</td></tr>";
+        table += "<tr><td>Number of Ratings:</td><td>" + numRatings + "</td></tr>";
+        table += "<tr><td>Price:</td><td>$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2) + "</td></tr></table>";
+
+
+        output = table + output;
         $("#get_review_results").html(output);
     });
 }
@@ -170,7 +179,7 @@ function recommendProduct(productId, productName, productUPC, productDescription
 $("#result_button").click(function() {
     $("#get_results").show(100);
     $("#get_review_results").hide(100);
-    $("#result_button").hide();
+    $("#result_button").hide(100);
 });
 
 //When the document is loaded, look at the product table and 
@@ -187,7 +196,10 @@ jQuery(document).ready(function() {
 
     $("form[name='get_product']").submit(function(e) {
         e.preventDefault();
-        $("#result_button").hide();
+        $("#get_results").show(100);
+        $("#result_button").hide(100);
+        $("#get_review_results").hide(100);
+
         var get_url = "";
         var productName = $("input[name='productName']", $(this)).val();
         productName.replace("/", "");

@@ -40,39 +40,122 @@
 <script type="text/javascript" src="/assets/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" charset="utf-8">
 
-function recommendProduct(productId, productName) {
+
+function recommendProduct(productId, productName, productUPC, productDescription, productPrice) {
     //Hide the list of products and show the back button and reviews
     $("#get_results").hide(30);
     $("#result_button").show();
     $("#get_review_results").show(30);
 
-    var get_url = "/services/product/v1/review/pid/" + productId + "?format=json";
+    var review_url = "/services/product/v1/review/pid/" + productId + "?format=json";
+    var reviewData;
         $.ajax({
-            url: get_url,
+            url: review_url,
             success:function(r) {
-                var output = "The product " + productName + " has no reviews at the moment so no recommendation can be made.";
-                if (r.reviewEntry[0] != null) {
-                  var avgRating = 0;
-                  output = "<table><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
-                  for(var i =0; i< r.reviewEntry.length; i++) { 
-                    output += "<tr><td>" + r.reviewEntry[i].title + "</td>";
-                    output += "<td>" + r.reviewEntry[i].comment + "</td>";
-                    output += "<td>" + r.reviewEntry[i].rating + "</td>";
-                    output += "</tr>";
-                    avgRating += r.reviewEntry[i].rating;
-                  }
-                  output += "</table>";
-                  avgRating = avgRating/r.reviewEntry.length;
-                  avgRating = avgRating.toFixed(2);
-                  if(avgRating >= 3.5) {
-                    output = "The product " + productName + " has an average rating of " + avgRating + " so it is recommended.<hr>" + output;
-                  } else {  
-                    output = "The product " + productName + " has an average rating of " + avgRating + " so it is NOT recommended.<hr>" + output;
-                  }
-                } 
-                $("#get_review_results").html(output);
-            }
+                reviewData = r;
+           }
         });
+
+//    var amazon_url = "/services/product/v1/amazon/upc/" + productUPC + "?format=json";
+    var amazonData;
+//    $.ajax({
+//        url: amazon_url,
+//        success:function(a) {
+//            amazonData = a;
+//        }
+//    });
+
+    $(document).ajaxStop(function() {
+
+        var salesRank;
+        var promotion;
+        var amazonUrl;
+        var imageUrl;
+        var amazonPrice;
+        var editorialReview;
+
+        if (amazonData != null) {
+            salesRank = amazonData.amazonEntry[0].salesRank;
+            promotion = amazonData.amazonEntry[0].promotion;
+            amazonUrl = amazonData.amazonEntry[0].amazonUrl;
+            imageUrl = amazonData.amazonEntry[0].imageUrl;
+            amazonPrice = amazonData.amazonEntry[0].amazonPrice;
+            editorialReview = amazonData.amazonEntry[0].editorialReview;
+        }
+
+        var avgRating;
+        var numRatings;
+        var output;
+
+        if (reviewData.reviewEntry[0] != null) {
+            avgRating = 0;
+            numRatings = reviewData.reviewEntry.length;
+
+            output = "<table class=\"table table-bordered\"><tr><th>Title</th><th>Comment</th><th>Rating</th></tr>";
+            for(var i =0; i< reviewData.reviewEntry.length; i++) {
+                output += "<tr><td>" + reviewData.reviewEntry[i].title + "</td>";
+                output += "<td>" + reviewData.reviewEntry[i].comment + "</td>";
+                output += "<td>" + reviewData.reviewEntry[i].rating + "</td>";
+                output += "</tr>";
+                avgRating += reviewData.reviewEntry[i].rating;
+            }
+            output += "</table>";
+            avgRating = avgRating/numRatings;
+            avgRating = avgRating.toFixed(2);
+        }
+
+        var rec;
+        var confidence;
+        var price;
+        if (amazonData != null && reviewData.reviewEntry[0] != null) {
+            //MAGIC WOMBO COMBO!!!
+
+            rec = "Buy!";
+            confidence = 5;
+            price = amazonPrice;
+
+        } else if (amazonData != null) {
+            //MAGIC AMAZON SHITTTTTTT
+            rec = "Buy!";
+            confidence = 5;
+            price = amazonPrice;
+
+        } else if (reviewData.reviewEntry[0] != null) {
+            if (numRatings >= 1000) {
+                confidence = 5;
+            } else if (numRatings >= 100) {
+                confidence = 4;
+            } else if (numRatings >= 10) {
+                confidence = 3;
+            } else if (numRatings >= 5) {
+                confidence = 2;
+            } else {
+                confidence = 1;
+            }
+
+            if (avgRating >= 3.5) {
+                rec = "Buy!";
+            } else {
+                rec = "Don't Buy!";
+            }
+
+            price = productPrice;
+        } else {
+            rec = "No Information";
+            confidence = 0;
+            price = productPrice;
+        }
+
+        //Construct table from rec, confidence, productDescription, price, and optionally salesrank and promotion
+        //rec is "Buy!", "Don't Buy!", or "No information"
+        //confidence is from 0-5
+        //description is a text description of the product
+        //price is a price in format 999 for $9.99
+        //end with output = [your table] + output;
+
+        output = "Stuff: " + rec + " " + confidence + " " + productDescription + " " + price + "<hr>" + output;
+        $("#get_review_results").html(output);
+    });
 }
 
 //If the back button is clicked, show the list of products and hide reviews
@@ -99,6 +182,7 @@ jQuery(document).ready(function() {
         $("#result_button").hide();
         var get_url = "";
         var productName = $("input[name='productName']", $(this)).val();
+        productName.replace("/", "");
         var productList = document.getElementById("categoryList"); 
         var productCategory = productList.options[productList.selectedIndex].value;
         if(productName == "" || productName == null) {
@@ -113,7 +197,7 @@ jQuery(document).ready(function() {
                 if (r.productEntry[0] != null) {
                   output = "<ol>";
                   for(var i=0; i<r.productEntry.length; i++) {
-                    output += '<li><a onClick="recommendProduct(' + r.productEntry[i].productId + ', \''+ r.productEntry[i].productName + '\');">' + r.productEntry[i].productName + "</a></li>"; 
+                    output += '<li><a onClick="recommendProduct(' + r.productEntry[i].productId + ', \''+ r.productEntry[i].productName + '\', '+ r.productEntry[i].productUPC + ', \''+ r.productEntry[i].productDescription + '\', ' + r.productEntry[i].productPrice + ');">' + r.productEntry[i].productName + "</a></li>";
                   }
                   output += "</ol>";
                 }

@@ -55,10 +55,17 @@ public class ProductResource {
 
         ProductResponse response = new ProductResponse();
         ProductQuery query = ProductQuery.builder().productName(productName).build();
+        List<com.shopzilla.service.product.data.ProductEntry> daoResultExactName =
+                dao.getProductByExactName(query);
+        for (int i = 0; i < daoResultExactName.size(); i++) {
+            response.getProductEntry().add(mapper.map(daoResultExactName.get(i), ProductEntry.class));
+        }
         List<com.shopzilla.service.product.data.ProductEntry> daoResults =
                 dao.getProductEntries(query);
-        for (com.shopzilla.service.product.data.ProductEntry product : daoResults) {
-            response.getProductEntry().add(mapper.map(product, ProductEntry.class));
+        for (int i = 0; i < daoResults.size() && i < 10 - daoResultExactName.size(); i++) {
+            if (productName.equals(daoResults.get(i).getProductName()))
+                continue;
+            response.getProductEntry().add(mapper.map(daoResults.get(i), ProductEntry.class));
         }
         return buildResponse(response, format);
     }

@@ -122,7 +122,8 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         Hashtable<Long, Long> conflicts = new Hashtable<Long, Long>();
     	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
     	try {
-            for (String s = raf.readLine(); s != null; s=raf.readLine()) {
+            int count = 0;
+            for (String s = raf.readLine(); s != null && count < 1000; s=raf.readLine()) {
                 if (s.equals("<doc>")) {
                     long pid = Long.parseLong(fieldFromLine(raf.readLine()));
                     String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
@@ -135,6 +136,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     if (rs.isEmpty()) {
                         // New product
                         handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) KEY(product_id) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
+                        count++;
                     } else {
                         // Existing product
                         Map<String, Object> row = rs.get(0);

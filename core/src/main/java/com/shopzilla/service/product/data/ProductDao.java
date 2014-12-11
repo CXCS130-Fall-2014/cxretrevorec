@@ -23,7 +23,7 @@ public interface ProductDao extends Transactional<ProductDao> {
 
     /* Read */
     @SqlQuery(
-            "SELECT * FROM product_entry WHERE product_name = :q.productName "
+            "SELECT * FROM product_entry WHERE soundex(product_name) = soundex(:q.productName) "
     )
     public List<ProductEntry> getProductEntries(@BindBean("q") ProductQuery query);
 

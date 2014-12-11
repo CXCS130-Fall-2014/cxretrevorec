@@ -137,6 +137,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         //Import new product data from RetrevoProductData.xml
     	RandomAccessFile raf = new RandomAccessFile("RetrevoProductData.xml", "r");
     	try {
+            int count = 0;
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
                 if (s.equals("  <ROW>")) {
                     String pid = getLongValue(fieldFromLine(raf.readLine()));

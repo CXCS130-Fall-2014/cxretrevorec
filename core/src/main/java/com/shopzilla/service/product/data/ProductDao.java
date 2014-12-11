@@ -27,6 +27,12 @@ public interface ProductDao extends Transactional<ProductDao> {
     )
     public List<ProductEntry> getProductEntries(@BindBean("q") ProductQuery query);
 
+    /* Get By Exact Name */
+    @SqlQuery(
+            "SELECT * FROM product_entry WHERE product_name = :q.productName"
+    )
+    public List<ProductEntry> getProductByExactName(@BindBean("q") ProductQuery query);
+
     /* Get By Category */
     @SqlQuery(
             "SELECT * FROM product_entry WHERE product_category = :q.productCategory "

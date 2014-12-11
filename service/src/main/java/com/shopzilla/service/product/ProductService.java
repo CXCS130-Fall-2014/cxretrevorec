@@ -96,18 +96,34 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         return xmlLine.substring(start, end);
     }
 
+    String getLongValue(String input) {
+        Long ret;
+        try {
+            ret = Long.parseLong(input);
+        } catch (NumberFormatException nfe) {
+            System.err.println(nfe.getMessage());
+            return "NULL";
+        }
+        return ret.toString();
+    }
+
     public boolean loadData(Handle handle) throws IOException{
         // max title length in the dataset is 150
         // max comment length in the dataset is 1952
         // title and comments need single quotes escaped
 
-        //Create the two tables, product_entry and reviews
+        //Create the two tables, products and reviews
         handle.execute("DROP ALL OBJECTS");
-        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (product_id LONG NOT NULL," + 
-        		"product_category VARCHAR(300) NOT NULL," +
-        		"product_name VARCHAR(300) NOT NULL," +
-                        "review_count INTEGER," +
-        		"primary key (product_id))");
+        handle.execute("CREATE TABLE IF NOT EXISTS product_entry (" +
+                "product_id LONG NOT NULL," +
+                "product_name VARCHAR(300) NOT NULL," +
+                "product_description VARCHAR(300) NOT NULL," +
+                "product_price LONG NOT NULL," +
+                "product_upc LONG," +
+                "product_category VARCHAR(300) NOT NULL," +
+                "product_ean13 LONG," +
+                "review_count INTEGER," +
+                "PRIMARY KEY (product_id))");
         handle.execute("CREATE TABLE IF NOT EXISTS reviews (" +
                 "rid LONG NOT NULL," +
                 "pid LONG NOT NULL," +
@@ -118,35 +134,35 @@ public class ProductService extends Service<ProductServiceConfiguration> {
 
         System.out.println("Start loading products");
 
-        //Import all product data from dataset2.xml
-        Hashtable<Long, Long> conflicts = new Hashtable<Long, Long>();
-    	RandomAccessFile raf = new RandomAccessFile("products.xml", "r");
+        //Import new product data from RetrevoProductData.xml
+    	RandomAccessFile raf = new RandomAccessFile("RetrevoProductData.xml", "r");
     	try {
             for (String s = raf.readLine(); s != null; s=raf.readLine()) {
-                if (s.equals("<doc>")) {
-                    long pid = Long.parseLong(fieldFromLine(raf.readLine()));
-                    String cat = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+                if (s.equals("  <ROW>")) {
+                    String pid = getLongValue(fieldFromLine(raf.readLine()));
+                    // Skip sku
+                    raf.readLine();
                     String name = fieldFromLine(raf.readLine()).replaceAll("'", "''");
-                    cat = cat.replace("\\", "/");
+                    String description = fieldFromLine(raf.readLine()).replaceAll("'", "''");
+                    String price = getLongValue(fieldFromLine(raf.readLine()));
+                    // Skip sku_norm
+                    raf.readLine();
+                    String upc = getLongValue(fieldFromLine(raf.readLine()));
+                    String cat = fieldFromLine(raf.readLine());
+                    String ean13 = getLongValue(fieldFromLine(raf.readLine()));
+
                     name = name.replace("\\", "/");
-                    String select = "SELECT product_id, product_name FROM product_entry " +
-                            "WHERE product_name='" + name + "' LIMIT 1";
-                    List<Map<String, Object>> rs = handle.select(select);
-                    if (rs.isEmpty()) {
-                        // New product
-                        handle.execute("MERGE INTO product_entry (product_id, product_category, product_name) KEY(product_id) VALUES (" + pid + ", \'" + cat + "\', \'" + name + "\')");
-                    } else {
-                        // Existing product
-                        Map<String, Object> row = rs.get(0);
-                        Long originalId = (Long) row.get("product_id");
-                        Long conflictId = new Long(pid);
-                        conflicts.put(conflictId, originalId);
-                    }
+                    description = name.replace("\\", "/");
+                    cat = cat.replace("\\", "/");
+                    String merge = "MERGE INTO product_entry (product_id, product_name, product_description, product_price, product_upc, product_category, product_ean13, review_count) KEY(product_id) VALUES (" + pid + ", \'" + name + "\', \'" + description + "\', " + price + ", " + upc + ", \'" + cat + "\', " + ean13 + ", 0)";
+                    System.out.println(merge);
+                    handle.execute(merge);
                 }
             }
         } finally {
             raf.close();
         }
+        
 
         System.out.println("Finished loading products");
 
@@ -176,10 +192,12 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                 if (product.getNodeType() == Node.ELEMENT_NODE) {
                     NamedNodeMap nnm = product.getAttributes();
                     pid = nnm.getNamedItem("PID").getNodeValue();
-                    Long longPid = Long.parseLong(pid);
-                    if (conflicts.containsKey(longPid)) {
-                        pid = conflicts.get(longPid).toString();
-                    }
+
+                    List<Map<String, Object>> rs = handle.select("SELECT product_id FROM product_entry WHERE product_id = " + pid + "LIMIT 1");
+                    // Only care about products in our products table
+                    if (rs.isEmpty())
+                        continue;
+
                     Node child = product.getChildNodes().item(1);
                     NodeList reviews = child.getChildNodes();
                     review_count = 0;
@@ -201,7 +219,9 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             // some ratings are empty
                             rating = (rating.isEmpty()) ? "NULL" : rating;
                             review_count++;
-                            handle.execute("MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')");
+                            String merge = "MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')";
+                            System.out.println(merge);
+                            handle.execute(merge);
                             rid++;
                         }
                     }

@@ -185,12 +185,14 @@ function recommendProduct(productId, productName, productUPC, productDescription
         table += "<tr><td>Confidence:</td><td>" + confidence + "/5</td></tr>";
         table += "<tr><td>Average Rating:</td><td>" + avgRating + "</td></tr>";
         table += "<tr><td>Number of Ratings:</td><td>" + numRatings + "</td></tr>";
-        table += "<tr><td>Price:</td><td>" + price + "</td></tr></table>";
+        table += "<tr><td>Price:</td><td>" + price + "</td></tr>";
+        table += "<tr><td>Description:</td><td>" + productDescription + "</td></tr></table>";
 
 
         output = table + output;
         if(amazonData.imageUrl != "") {
             $("#product_image").html("<img src='" + amazonData.imageUrl + "' alt='productImage' style='width:80px; height:80px; margin:auto'>");
+            $("#product_image").show(100);
         }
         $("#get_review_results").html(output);
     });
@@ -201,6 +203,7 @@ $("#result_button").click(function() {
     $("#get_results").show(100);
     $("#get_review_results").hide(100);
     $("#result_button").hide(100);
+    $("#product_image").hide(100);
 });
 
 //When the document is loaded, look at the product table and 
@@ -220,6 +223,7 @@ jQuery(document).ready(function() {
         $("#get_results").show(100);
         $("#result_button").hide(100);
         $("#get_review_results").hide(100);
+        $("#product_image").hide(100);
 
         var get_url = "";
         var productName = $("input[name='productName']", $(this)).val();

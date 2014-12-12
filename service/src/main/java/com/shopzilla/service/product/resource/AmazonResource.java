@@ -35,8 +35,7 @@ import javax.net.ssl.HttpsURLConnection;
 @Path("/amazon")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON})
 public class AmazonResource {
-    private static final String access_key = "AKIAICOFLE2S6RWUIJ7A";
-    private static final String secret_key = "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";
+
     private static final String associate_tag = "retrevo01-20";
     private static final String endpoint = "ecs.amazonaws.com";
     private final String USER_AGENT = "Mozilla/5.0";
@@ -65,6 +64,7 @@ public class AmazonResource {
         while(UPC.length() < 12) {
             UPC = "0" + UPC;
         }
+        UPC = UPC.substring(UPC.length() - 12);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("Service", "AWSECommerceService");
@@ -107,7 +107,7 @@ public class AmazonResource {
 	in.close();
  
 	//print result
-        System.out.println(response.toString());
+//        System.out.println(response.toString());
 	return(response.toString());
 
     }

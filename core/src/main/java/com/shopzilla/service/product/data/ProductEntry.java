@@ -82,9 +82,14 @@ public class ProductEntry {
             toReturn.setProductId(rs.getLong("product_id"));
             toReturn.setProductName(rs.getString("product_name"));
             toReturn.setProductCategory(rs.getString("product_category"));
-            toReturn.setProductUPC(rs.getLong("product_upc"));
             toReturn.setProductDescription(rs.getString("product_description"));
             toReturn.setProductPrice(rs.getLong("product_price"));
+
+            if (rs.getLong("product_upc") == 0) {
+                toReturn.setProductUPC(rs.getLong("product_ean13"));
+            } else {
+                toReturn.setProductUPC(rs.getLong("product_upc"));
+            }
             return toReturn;
         }
     }

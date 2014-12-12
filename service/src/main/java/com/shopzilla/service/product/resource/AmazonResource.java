@@ -65,13 +65,18 @@ public class AmazonResource {
         while(UPC.length() < 12) {
             UPC = "0" + UPC;
         }
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Service", "AWSECommerceService");
         params.put("Operation", "ItemLookup");
         params.put("IdType", "UPC");
+        params.put("Conditions", "All");
+        params.put("IncludeReviewsSummary", "True");
         params.put("SearchIndex", "All");
+        params.put("Timestamp", "2014-12-11T08:09:20Z");
         params.put("ItemId", UPC);
-        params.put("ResponseGroup", "Large");
+        params.put("ResponseGroup", "OfferFull, EditorialReview, ItemAttributes, Images");
+        params.put("Version", "2013-08-01");
         params.put("AssociateTag", associate_tag);
        
         requestUrl = helper.sign(params);
@@ -102,6 +107,7 @@ public class AmazonResource {
 	in.close();
  
 	//print result
+        System.out.println(response.toString());
 	return(response.toString());
 
     }

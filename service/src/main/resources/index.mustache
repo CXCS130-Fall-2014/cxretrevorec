@@ -43,6 +43,7 @@ div {
         </div>
     </div>
     <div id="get_results" style="width:100%;"></div>
+    <div id="product_image" style="width:100%;"></div>
     <div id="get_review_results" style="width:100%; padding-bottom:5%"></div>
 </div>
 
@@ -64,48 +65,34 @@ function recommendProduct(productId, productName, productUPC, productDescription
            }
         });
     var amazonData = {
-        sr:"",
-        amazonUrl:"",
         imageUrl:"",
-        amazonPrice:""
+        amazonPrice:"",
+        amazonNew:"",
+        amazonUsed:"",
     };
     var get_url = "/services/product/v1/amazon/upc/" + productUPC + "?format=json";
          $.ajax({
             url: get_url,
             dataType: "xml",
             success:function(r) {
-               amazonData.sr = $(r).find("SalesRank").text();
-               amazonData.amazonUrl = $(r).find("DetailPageURL").text();
                amazonData.imageUrl = $(r).find("ImageSets > ImageSet > SmallImage > URL").text();
-               amazonData.amazonPrice = $(r).find("OfferSummary > LowestUsedPrice > FormattedPrice").text();
+               amazonData.amazonPrice = $($(r).find("ItemAttributes > ListPrice")[0]).find("FormattedPrice").text();
+               amazonData.amazonNew = $(r).find("OfferSummary > TotalNew").text();
+               amazonData.amazonUsed = $(r).find("OfferSummary > TotalUsed").text();
             }
         });
  
     $(document).ajaxStop(function() {
 
-        var salesRank;
-        //var promotion;
-        var amazonUrl;
-        var imageUrl;
-        var amazonPrice;
-        //var editorialReview;
-
-        if (amazonData != null) {
-            salesRank = amazonData.sr;
-            amazonUrl = amazonData.amazonUrl;
-            imageUrl = amazonData.imageUrl;
-            amazonPrice = amazonData.amazonPrice;
-        }
-
         var avgRating;
         var numRatings;
-        var output;
-
+        var output = "";
+        
         if (reviewData.reviewEntry[0] != null) {
             avgRating = 0;
             numRatings = reviewData.reviewEntry.length;
 
-            output = "<table class=\"table table-bordered\"><tr><th>Review Title</th><th>Comment</th><th>Rating</th></tr>";
+            output += "<table class=\"table table-bordered\"><tr><th>Review Title</th><th>Comment</th><th>Rating</th></tr>";
             for(var i =0; i< reviewData.reviewEntry.length; i++) {
                 output += "<tr><td>" + reviewData.reviewEntry[i].title + "</td>";
                 output += "<td>" + reviewData.reviewEntry[i].comment + "</td>";
@@ -118,48 +105,71 @@ function recommendProduct(productId, productName, productUPC, productDescription
             avgRating = avgRating.toFixed(2);
         }
 
-        var rec;
+        var rec =0;
         var confidence;
         var price;
-        if (amazonData != null && reviewData.reviewEntry[0] != null) {
-            //MAGIC WOMBO COMBO!!!
 
-            rec = "Buy!";
-            confidence = 5;
-            price = amazonPrice.toString();
-
-        } else if (amazonData != null) {
-            //MAGIC AMAZON SHITTTTTTT
-            rec = "Buy!";
-            confidence = 5;
-            price = amazonPrice.toString();
-
-        } else if (reviewData.reviewEntry[0] != null) {
-            if (numRatings >= 1000) {
+        if (reviewData.reviewEntry[0] != null) {
+            if (numRatings >= 100) {
                 confidence = 5;
+                rec += 3;
             } else if (numRatings >= 30) {
                 confidence = 4;
+                rec += 2;
             } else if (numRatings >= 10) {
                 confidence = 3;
+                rec += 1;
             } else if (numRatings >= 5) {
                 confidence = 2;
+                rec -= 1;
             } else {
                 confidence = 1;
+                rec -= 3;
             }
-
-            if (avgRating >= 3.5) {
-                rec = "Buy!";
+            if (amazonData.amazonNew != "") {
+                var numNewProd = Number(amazonData.amazonNew);
+                if(numNewProd >=40) {
+                    rec += 3;
+                } else if (numNewProd >= 20) {
+                    rec += 1;
+                } else {
+                    rec -= 2;
+                }
+            }
+            if (amazonData.amazonUsed != "") {
+                var numUsedProd = Number(amazonData.amazonUsed);
+                if(numUsedProd >=40) {
+                    rec -= 3;
+                } else if (numUsedProd >= 20) {
+                    rec -= 1;
+                } else {
+                    rec += 2;
+                }
+            }
+            if (avgRating >= 4) {
+                rec += 2;
+            } else if (avgRating = 3) {
+                rec += 1;
+            } else if (avgRating = 2) {
+                rec -= 1;
             } else {
-                rec = "Don't Buy!";
+                rec -= 2;
             }
-
-            price = productPrice.toString();
-            price = "$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2);
+            if(rec > 0) {
+                rec = "Buy!";
+            } else if (rec < 0) {
+                rec = "Don't Buy!"; 
+            } else {
+                rec = "Not Enough Information";
+            }    
+            if(amazonData.amazonPrice != "") {
+                price = amazonData.amazonPrice; 
+            } else {
+                price = productPrice.toString();
+                price = "$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2); 
+            }
         } else {
-            rec = "No Information";
-            confidence = 0;
-            price = productPrice.toString();
-            price = "$" + price.substring(0,price.length-2) + "." + price.toString().substring(price.length-2);
+            rec = "Not Enough Information";
         }
 
         //Construct table from rec, confidence, productDescription, price, and optionally salesrank and promotion
@@ -179,6 +189,9 @@ function recommendProduct(productId, productName, productUPC, productDescription
 
 
         output = table + output;
+        if(amazonData.imageUrl != "") {
+            $("#product_image").html("<img src='" + amazonData.imageUrl + "' alt='productImage' style='width:80px; height:80px; margin:auto'>");
+        }
         $("#get_review_results").html(output);
     });
 }

@@ -153,7 +153,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     String ean13 = getLongValue(fieldFromLine(raf.readLine()));
 
                     name = name.replace("\\", "/");
-                    description = name.replace("\\", "/");
+                    description = description.replace("\\", "/");
                     cat = cat.replace("\\", "/");
                     String merge = "MERGE INTO product_entry (product_id, product_name, product_description, product_price, product_upc, product_category, product_ean13, review_count) KEY(product_id) VALUES (" + pid + ", \'" + name + "\', \'" + description + "\', " + price + ", " + upc + ", \'" + cat + "\', " + ean13 + ", 0)";
                     System.out.println(merge);

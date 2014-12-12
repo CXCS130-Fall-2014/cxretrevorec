@@ -86,6 +86,7 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         environment.addResource(new ProductResource(productDao, mapper));
         environment.addResource(new ReviewResource(reviewDao, mapper));
         environment.addResource(new CategoryResource(categoryDao, mapper));
+        environment.addResource(new AmazonResource());
         environment.addResource(new IndexResource());
     }
 
@@ -96,12 +97,20 @@ public class ProductService extends Service<ProductServiceConfiguration> {
         return xmlLine.substring(start, end);
     }
 
+    String getCategoryValue(String in) {
+        int start = in.indexOf(">")+1;
+        int end = in.indexOf("&", start);
+        if(end < 0) {
+            return "other";
+        }
+        return in.substring(start, end);
+    }
+
     String getLongValue(String input) {
         Long ret;
         try {
             ret = Long.parseLong(input);
         } catch (NumberFormatException nfe) {
-            System.err.println(nfe.getMessage());
             return "NULL";
         }
         return ret.toString();
@@ -149,14 +158,13 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                     // Skip sku_norm
                     raf.readLine();
                     String upc = getLongValue(fieldFromLine(raf.readLine()));
-                    String cat = fieldFromLine(raf.readLine());
+                    String cat = getCategoryValue(raf.readLine());
                     String ean13 = getLongValue(fieldFromLine(raf.readLine()));
 
                     name = name.replace("\\", "/");
                     description = description.replace("\\", "/");
                     cat = cat.replace("\\", "/");
                     String merge = "MERGE INTO product_entry (product_id, product_name, product_description, product_price, product_upc, product_category, product_ean13, review_count) KEY(product_id) VALUES (" + pid + ", \'" + name + "\', \'" + description + "\', " + price + ", " + upc + ", \'" + cat + "\', " + ean13 + ", 0)";
-                    System.out.println(merge);
                     handle.execute(merge);
                 }
             }
@@ -221,7 +229,6 @@ public class ProductService extends Service<ProductServiceConfiguration> {
                             rating = (rating.isEmpty()) ? "NULL" : rating;
                             review_count++;
                             String merge = "MERGE INTO reviews (rid, pid, title, rating, comment) VALUES (" + rid + "," + pid + ",'" + title + "'," + rating + ",'" + comment + "')";
-                            System.out.println(merge);
                             handle.execute(merge);
                             rid++;
                         }

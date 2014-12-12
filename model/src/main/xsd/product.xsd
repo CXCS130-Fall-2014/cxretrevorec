@@ -23,6 +23,9 @@
     <xs:attribute name="productId" type="xs:long"/>
     <xs:attribute name="productName" type="xs:string"/>
     <xs:attribute name="productCategory" type="xs:string"/>
+    <xs:attribute name="productUPC" type="xs:long"/>
+    <xs:attribute name="productDescription" type="xs:string"/>
+    <xs:attribute name="productPrice" type="xs:long"/>
   </xs:attributeGroup>
 
 </xs:schema>

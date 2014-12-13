@@ -1,9 +1,10 @@
 #Quickstart
 
 <pre>
-    # Make sure database.xml and database2.xml is in the cxretrevorec directory and renamed to reviews.xml and products.xml respectively
-    # Import data is limited to first 100 so compile time doesnt suck
-    
+    # Download Retrevo Data.zip
+    # Unzip file into cxretrevorec directory
+    # Rename dataset.xml to reviews.xml
+ 
     Just run compile.sh
 
     # commands in compile.sh
